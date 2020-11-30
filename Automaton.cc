@@ -1,6 +1,7 @@
 #include "Automaton.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 
 namespace fa{
   Automaton::Automaton() { 
@@ -346,6 +347,19 @@ namespace fa{
     return accessibleStates;
   }
 
+  /*
+  For a given state, returns a set containing all states that are accessible within a single move using a given letter
+  */
+  std::set<int> statesFromStateLetter(const Automaton *automaton,int from,char c){
+    std::set<int>accessibleStates;
+    for(std::map<int,int>::const_iterator to=automaton->etats.begin();to!=automaton->etats.end();++to){
+      if(automaton->hasTransition(from,c,to->first)){
+        accessibleStates.insert(to->first);
+      }
+    }
+    return accessibleStates;
+  }
+
   void Automaton::removeNonCoAccessibleStates(){
     //vector containing the accessible states
     std::set<int> coAccessibleStates;
@@ -547,239 +561,185 @@ std::string split(std::string str,char delimiter, int posWanted){
   return "NOT FOUND";
 }
 
-int satValue(std::map<int,std::string> tableOfCorrespondances,int from,char c, int to){
-  for(std::map<int,std::string>::const_iterator it=tableOfCorrespondances.begin();it!=tableOfCorrespondances.end();++it){
-    if(split(it->second,' ',0)==std::to_string(from) && split(it->second,' ',1)[0]==c && split(it->second,' ',2)==std::to_string(to)){
-      return it->first;
-    }
+//automaton : 1 for the one to be included, 2 for the other
+int satValueAutomatons(std::map<std::string,int> tableOfCorrespondances1,int automaton,int state, int step){
+  std::string index="";
+  if(automaton==1){
+    index+="A1 ";
+  }else if(automaton==2){
+    index+="A2 ";
   }
-  return -1;
+  index+=std::to_string(state)+" "+std::to_string(step);
+  return tableOfCorrespondances1.at(index);
+}
+
+int satValueWord(std::map<std::string,int> tableOfCorrespondances1,char letter,int pos){
+  std::string index="";index.push_back(letter);
+  index+=" "+std::to_string(pos);
+  return tableOfCorrespondances1.at(index);
+}
+
+void printTable(std::map<std::string,int> table){
+  for(std::map<std::string,int>::const_iterator it=table.begin();it!=table.end();++it){
+    std::cout << it->first << " -> "<< it->second << "\n";
+  }
 }
 
 using namespace std;
 int main(int argc, char **argv){
+
+  fa::Automaton A1;
+
+  A1.addSymbol('a');
+  A1.addSymbol('b');
+
+  A1.addState(0);
+  A1.addState(1);
+  A1.addState(2);
+  A1.addState(3);
+  A1.addState(4);
+
+  A1.setStateInitial(0);
+  A1.setStateFinal(4);
+
+  A1.addTransition(0,'a',1);
+  A1.addTransition(1,'a',2);
+  A1.addTransition(1,'b',2);
+  A1.addTransition(2,'a',3);
+  A1.addTransition(2,'b',3);
+  A1.addTransition(3,'a',4);
+  A1.addTransition(3,'b',4);
+  A1.dotPrint(std::cout);
+
+  fa::Automaton A2;
+
+  A2.addSymbol('a');
+  A2.addSymbol('b');
+
+  A2.addState(0);
+  A2.addState(1);
+  A2.addState(2);
+  A2.addState(3);
+  A2.addState(4);
+  A2.addState(5);
+  A2.addState(6);
+  A2.addState(7);
+
+  A2.setStateInitial(0);
+  A2.setStateFinal(4);
+
+  A2.addTransition(0,'a',1);
+  A2.addTransition(1,'a',2);
+  A2.addTransition(2,'a',3);
+  A2.addTransition(2,'b',3);
+  A2.addTransition(3,'a',4);
+  A2.addTransition(3,'b',4);
+  A2.addTransition(0,'b',5);
+  A2.addTransition(5,'a',6);
+  A2.addTransition(5,'b',6);
+  A2.addTransition(6,'a',7);
+  A2.addTransition(6,'b',7);
+  A2.addTransition(7,'a',4);
+  //A2.dotPrint(std::cout);
   
-  //creation of first Automaton
-    /*fa::Automaton fa;
-    
-    fa.addSymbol('a');
-    fa.addSymbol('b');
+  int length=A1.countStates()-1;
 
-    fa.addState(1);
-    fa.addState(2);
-    fa.addState(3);
-    fa.addState(4);
-    fa.addState(5);
-    fa.setStateInitial(1);
-    fa.setStateFinal(5);
-    
-    fa.addTransition(1,'a',4);
-    fa.addTransition(1,'a',3);
-    fa.addTransition(1,'a',2);
-    fa.addTransition(2,'b',4);
-    fa.addTransition(3,'a',4);
-    fa.addTransition(3,'b',5);
-    fa.addTransition(4,'a',4);
-    fa.addTransition(4,'b',5);
-    fa.addTransition(5,'a',5);*/
+  std::map<std::string,int> tableOfCorrespondances;
+  //index is used to insert elements
+  int tableIndex=1;
+  
+  //Ajout des variables pour representer le mot : a4 = la 4eme lettre du mot est a
+  for(std::vector<char>::const_iterator it=A1.alphabet.begin();it!=A1.alphabet.end();++it){
+    for(int i=1;i<=length;++i){
+      std::string value="";
+      value.push_back(*it);
+      value+=" "+std::to_string(i);
+      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+      tableIndex++;
+    }
+  }
 
-    fa::Automaton fa;
-    
-    fa.addSymbol('a');
-    fa.addSymbol('b');
-    fa.addSymbol('c');
+  //Ajout des variables pour representer un etat(A1) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
+  for(std::map<int,int>::const_iterator it=A1.etats.begin();it!=A1.etats.end();it++){
+    for(int i=0;i<=length;++i){
+      std::string value="A1 "+std::to_string(it->first)+" "+std::to_string(i);
+      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+      tableIndex++;
+    }
+  }
 
-    fa.addState(1);
-    fa.addState(2);
-    fa.addState(3);
-    fa.addState(4);
-    fa.addState(5);
-    fa.addState(6);
-    fa.addState(7);
-    fa.addState(8);
-    fa.addState(9);
-    fa.addState(10);
-    fa.addState(11);
-    fa.addState(12);
-    fa.addState(13);
-    fa.addState(14);
+  //Ajout des variables pour representer un etat(A2) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
+  for(std::map<int,int>::const_iterator it=A2.etats.begin();it!=A2.etats.end();it++){
+    for(int i=0;i<=length;++i){
+      std::string value="A2 "+std::to_string(it->first)+" "+std::to_string(i);
+      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+      tableIndex++;
+    }
+  }
 
-    fa.setStateInitial(1);
-    fa.setStateInitial(2);
-    fa.setStateFinal(12);
-    fa.setStateFinal(14);
+  printTable(tableOfCorrespondances);
 
-    fa.addTransition(1,'a',3);
-    fa.addTransition(1,'c',4);
-    fa.addTransition(2,'a',5);
-    fa.addTransition(3,'b',6);
-    fa.addTransition(3,'c',4);
-    fa.addTransition(4,'c',5);
-    fa.addTransition(5,'b',1);
-    fa.addTransition(5,'c',8);
-    fa.addTransition(6,'c',7);
-    fa.addTransition(7,'a',5);
-    fa.addTransition(8,'a',9);
-    fa.addTransition(8,'c',10);
-    fa.addTransition(8,'b',11);
-    fa.addTransition(9,'b',7);
-    fa.addTransition(9,'c',10);
-    fa.addTransition(10,'a',11);
-    fa.addTransition(11,'a',13);
-    fa.addTransition(11,'b',12);
-    fa.addTransition(12,'a',12);
-    fa.addTransition(12,'a',14);
-    fa.addTransition(13,'a',13);
-    fa.addTransition(13,'c',14);
-    fa.addTransition(14,'b',12);
+  ofstream cnfFile;
+  cnfFile.open("test.cnf");
+  cnfFile << "p cnf " << tableIndex << " 0 \n";
+  /**************************Word is in A1*************************************/
+  
+  //at each place in the word, only a or only or b
+  for(int i=1;i<=length;++i){
+    cnfFile << satValueWord(tableOfCorrespondances,'a',i) << " " << satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+    cnfFile << "-" << satValueWord(tableOfCorrespondances,'a',i) << " -" <<satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+  }
 
-    fa.dotPrint(std::cout);
-    std::size_t maxLength=fa.countStates();
+  //Starts with an initial state
+  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+    if(A1.isStateInitial(state->first)){
+      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,0) << " ";
+    }
+  }
+  cnfFile << "0\n";
 
-    //int is value of transition that we'll use in SAT, string gives a representation : F C T F=state from, C=letter, T=state to
-    //Important : here only transitions are represented, we also need to represent the step we re in
-    //the variable transition (satValue) 4 at step 3 will be 4*countStates()*+3
-    std::map<int,std::string> tableOfCorrespondances;
-    int index=0;
-    for(std::map<int,std::multimap<char,int>>::const_iterator itm=fa.transis.begin();itm!=fa.transis.end();++itm){
-      for(const auto x: fa.transis.at(itm->first)){
-        std::string correspondance=std::to_string(itm->first)+" "+x.first+" "+std::to_string(x.second);
-        tableOfCorrespondances.insert(std::pair<int,std::string>(index*maxLength+1,correspondance));
-        printf("SAT : %ld equals to : ",index*maxLength+1);std::cout << correspondance; printf("\n");
-        ++index;
+  //Ends with a final state
+  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+    if(A1.isStateFinal(state->first)){
+      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,length) << " ";
+    }
+  }
+  cnfFile << "0\n";
+
+  //Max one state per step
+  for(int step=0;step<=length;++step){
+    for(size_t state=0;state<A1.countStates()-1;++state){
+      for(size_t state2=state+1;state2<A1.countStates();++state2){
+        cnfFile <<"-"<< satValueAutomatons(tableOfCorrespondances,1,state,step) << " -"<<satValueAutomatons(tableOfCorrespondances,1,state2,step) << " 0\n";
       }
     }
-  if(argc == 1){
-    //We can start writing the rules
-    ofstream cnfFile;
-    cnfFile.open("test.cnf");
-    cnfFile << "p cnf " << std::to_string(maxLength*fa.countTransitions()) << " 0 \n";
+  }
 
-    /********************************************************************************************************
-     *********************************In first language rules************************************************
-    *******************************************************************************************************/
-
-   //max 1 transition per step : countState²*countTransition rules of two vars
-    //for each step
-    for(std::size_t step=1;step<maxLength+1;++step){
-      //for each transi, if true, then all must be false
-      for(std::size_t transi=step;transi<=maxLength*(fa.countTransitions()-1)+step;transi=transi+maxLength){
-        for(std::size_t otherTransi=transi+maxLength;otherTransi<=maxLength*(fa.countTransitions()-1)+step;otherTransi=otherTransi+maxLength){
-          cnfFile << "-" << std::to_string(transi) <<" -" << std::to_string(otherTransi) <<" 0\n";
-        }
-      }
-    }
-
-    //must start with an initial state : 1 rule with num of init transitions vars
-    for(std::map<int,int>::const_iterator itOnStates=fa.etats.begin();itOnStates!=fa.etats.end();++itOnStates){
-      if(fa.isStateInitial(itOnStates->first)){
-        for(std::multimap<char,int>::const_iterator itOnTransi=fa.transis.at(itOnStates->first).begin();itOnTransi!=fa.transis.at(itOnStates->first).end();++itOnTransi){
-          cnfFile << std::to_string(satValue(tableOfCorrespondances,itOnStates->first,itOnTransi->first,itOnTransi->second)) << " ";
-        }
-      }
+  //At least one state per step
+  for(int step=0;step<=length;++step){
+    for(size_t state=0;state<A1.countStates();++state){
+      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state,step) << " ";
     }
     cnfFile << "0\n";
+  }
 
-    
+  //word follows A1's transitions
+  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+    std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
+    std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
+    for(int step=0;step<length;++step){
+      cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+      for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
+        cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+      }
+      cnfFile<<" 0\n";
 
-    //must end with a final state : (countTransitions - numOfFinalTransitions)*(maxLength-1) rules of numOfFinalTransitions+1 var
-    //if, at n+1 step, every variable is false, then one transition leading to a final step must be true at n step
-    //last step is particular, it will be done just after
-    //here we add the sat values of transitions leading to a final state (at step 0 by default)
-    std::set<int> transiToFinalStates;
-    for(std::map<int,int>::const_iterator itOnStates=fa.etats.begin();itOnStates!=fa.etats.end();++itOnStates){
-      if(fa.isStateFinal(itOnStates->first)){
-        for(std::map<int,std::multimap<char,int>>::const_iterator itTransi=fa.transis.begin();itTransi!=fa.transis.end();++itTransi){
-          for(std::multimap<char,int>::const_iterator itOnChars=itTransi->second.begin();itOnChars!=itTransi->second.end();++itOnChars){
-            if(itOnChars->second==itOnStates->first){
-              transiToFinalStates.insert(satValue(tableOfCorrespondances,itTransi->first,itOnChars->first,itOnStates->first));
-            }
-          }
-        }
+      cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+      for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
+        cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
       }
+      cnfFile<<" 0\n";
     }
-    //If there is a transition at nth step (>1) there must be a transition at n-1th step, 
-    //with n-1th transition's arriving state and nth transition's starting state being the same
-    for(size_t step=2;step<maxLength+1;++step){
-      for(size_t transi=step;transi<=step+(fa.countTransitions()-1)*maxLength;transi=transi+maxLength){
-        cnfFile << "-" <<std::to_string(transi);
-        //search for all transitions arriving on transi's starting state
-        int startingState = std::stoi(split(tableOfCorrespondances.at(transi-step+1),' ',0));
-        for(size_t transiBefore=step-1;transiBefore<=step+(fa.countTransitions()-1)*maxLength;transiBefore=transiBefore+maxLength){
-          if(std::stoi(split(tableOfCorrespondances.at(transiBefore-step+2),' ',2))==startingState){
-            cnfFile << " " <<std::to_string(transiBefore);
-          }
-        }
-        cnfFile << " 0\n";
-      }  
-    }
-    
-    for(size_t step=1;step<maxLength;++step){
-      //writing the rule
-      for(auto f : transiToFinalStates){
-        cnfFile << std::to_string(f+step-1) << " ";
-      }
-      for(std::size_t transi=step+1;transi<=maxLength*(fa.countTransitions()-1)+step;transi=transi+maxLength){
-        cnfFile << std::to_string(transi) << " ";
-      }
-      cnfFile << "0\n";
-    }
+  }
 
-    //At the last line, there can't be a non final state
-    for(std::size_t transi=fa.countStates();transi<=maxLength*(fa.countTransitions()-1)+fa.countStates();transi=transi+maxLength){
-      //if this transition isn't final
-      if(transiToFinalStates.find(transi-fa.countStates()+1)==transiToFinalStates.end()){
-          cnfFile << "-" <<std::to_string(transi) <<" 0\n";
-      }
-    }
-
-    
-
-    /********************************************************************************************************
-     ****************************Not in second language rules************************************************
-    *******************************************************************************************************/
-
-    cnfFile.close();
-  }else{
-    std::map<int,int> result;
-    string line;
-    ifstream outFile ("test.out");
-    if (outFile.is_open()){
-      while(getline(outFile,line)){
-        if(!line.compare("SAT")==0 && !line.compare("UNSAT")==0){
-          for(std::size_t i=0;i<maxLength*fa.countTransitions();++i){
-            std::string var=split(line,' ',i);
-            if(var.at(0)!='-'){
-              cout << var << " ";
-              result.insert(std::pair<int,int>(std::stoi(var),1));
-            }else{
-              result.insert(std::pair<int,int>(-std::stoi(var),0));
-            }
-          }
-        }
-      }
-      cout << "\n";
-      outFile.close();
-    }
-    bool wordIsFinished=false;
-    std::size_t step=1;
-    std::string wordFound="Word found is ";
-    std::string transitionUsed="Transitions used are ";
-    while(!wordIsFinished){
-      wordIsFinished=true;
-      if(step<maxLength+1){
-        for(size_t i=step;i<=maxLength*(fa.countTransitions()-1)+step;i=i+maxLength){
-          if(result.at(i)==1){
-            wordIsFinished=false;
-            transitionUsed+=tableOfCorrespondances.at(i-step+1)+" THEN ";
-            wordFound+=split(tableOfCorrespondances.at(i-step+1),' ',1);
-          }
-        }
-        step++;
-      }
-    }
-    transitionUsed+='\n';
-    wordFound+='\n';
-    cout << wordFound << transitionUsed;
-  } 
 }
