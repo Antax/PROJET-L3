@@ -742,4 +742,42 @@ int main(int argc, char **argv){
     }
   }
 
+  /**** Rules of A2  ****/
+
+  //Starts with an initial state
+  for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
+    if(A2.isStateInitial(state->first)){
+      cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " ";
+    }
+  }
+  cnfFile << "0\n";
+
+  //Accessible States
+  for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
+    std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
+    std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
+    for(int step=0;step<length;step++){
+
+      for(auto to : destinationsA){
+        cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+        cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+        cnfFile<<" 0\n";
+       }
+      
+      for(auto to : destinationsB){
+        cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+        cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+        cnfFile<<" 0\n";
+      }
+      
+    }
+  }
+
+  //isNotFinalState
+  for(auto state : A2.etats){
+    if(A2.isStateFinal(state.first)){
+        cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
+    }
+  }
+
 }
