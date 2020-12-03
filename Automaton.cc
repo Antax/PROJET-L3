@@ -534,6 +534,84 @@ namespace fa{
     return result;
   }
 
+
+    /**
+     * Create a deterministic automaton, if not already deterministic
+     */
+    Automaton Automaton::createDeterministic(const Automaton& other){
+      Automaton product;
+      product.alphabet=other.alphabet;
+      std::map<int,std::set<int>>tab;
+      std::set<int>dest;
+      product.addState(0);
+      auto s=other.etats.begin();
+      while(s!=other.etats.end()){
+        if(s->second==1){//Initial
+          tab[0].insert(s->first);
+        }
+      }
+      //first state will be initial (build from initial states)
+      product.setStateInitial(0);
+
+      if(tab[0].empty()){
+        return product;
+      }
+      
+      auto it=tab.begin();
+      while(it!=tab.end()){
+        for(size_t i=0;i<product.alphabet.size();++i){
+          
+          int in=0;
+          for(auto s : it->second){
+
+              dest=statesFromStateLetter(&product,s,product.alphabet[i]);
+             
+          }
+        
+        if(!dest.empty()){
+          for(auto it = tab.begin();it!=tab.end();it++){
+            if(it->second==dest){
+              in=1;
+              break;
+            }
+          }
+          int n=-1;
+          if(in==0){
+            int n=tab.size();
+            tab[n]=dest;
+            product.addState(n);
+            product.addTransition(it->first,product.alphabet[i],n);
+          }else{
+            for(auto snb : tab){
+              if(snb.second==dest){
+                n=snb.first;
+              }
+            }
+            product.addTransition(it->first,product.alphabet[i],n);
+          }
+        }
+          
+        
+        dest.clear();
+      }
+      
+      it++;
+    }
+    //Search the final state
+    for(auto e : tab){
+      for(auto s : e.second){
+        if(other.isStateFinal(s)){
+          product.setStateFinal(e.first);
+        }
+      }
+    }
+
+
+      return product;
+    }
+
+
+
 }
 struct transi{
   int from;
@@ -584,6 +662,8 @@ void printTable(std::map<std::string,int> table){
     std::cout << it->first << " -> "<< it->second << "\n";
   }
 }
+
+
 
 using namespace std;
 int main(int argc, char **argv){
