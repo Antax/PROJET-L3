@@ -549,6 +549,7 @@ namespace fa{
         if(s->second==1){//Initial
           tab[0].insert(s->first);
         }
+        s++;
       }
       //first state will be initial (build from initial states)
       product.setStateInitial(0);
