@@ -721,7 +721,7 @@ int main(int argc, char **argv){
   fa::Automaton A2=RandomAutomaton(13);
   A1.dotPrint(std::cout);
   A2.dotPrint(std::cout);
-  return 0;
+ // return 0;
   // fa::Automaton A1;
 
   // A1.addSymbol('a');
