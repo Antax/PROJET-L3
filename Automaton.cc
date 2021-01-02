@@ -941,5 +941,32 @@ int main(int argc, char **argv){
         cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
     }
   }
-
+  if(argc>=2){
+    std::map<int,int> result;
+    string line;
+    ifstream outFile ("test.out");
+    if (outFile.is_open()){
+      while(getline(outFile,line)){
+        if(line.compare("UNSAT")==0){
+          cout << "A1 is included in A2\n";
+          return 1;
+        }
+        cout << "A1 is not included in A2\n";
+        if(!line.compare("SAT")==0){
+          for(int i=0;i<length*2;++i){
+            std::string var=split(line,' ',i);
+            if (var.at(0)!='-'){
+              if(stoi(var)<length/2){
+                cout<< "a";
+              }else{
+                cout<<"b";
+              }
+            }
+          }
+        }
+      }
+      cout << "\n";
+      outFile.close();
+    }
+  }
 }
