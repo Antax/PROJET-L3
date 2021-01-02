@@ -618,7 +618,6 @@ namespace fa{
       return product;
     }
 
-
 }
 struct transi{
   int from;
@@ -669,12 +668,60 @@ void printTable(std::map<std::string,int> table){
     std::cout << it->first << " -> "<< it->second << "\n";
   }
 }
+/*
+Création d'automate random 
+*/
+fa::Automaton RandomAutomaton(int nbstates){
+  fa::Automaton res;
+  std::vector<char> letter;
+  letter.push_back('a');
+  letter.push_back('b');
+  for(char c : letter){
+    res.addSymbol(c);
+  }
+  for(int i=0;i<nbstates;++i){
+    res.addState(i);
+  }
+  for(auto s : res.etats){
+    for(auto ss : res.etats){
+      for(char c : letter){
+        double rand1 = rand() / (double)RAND_MAX;
+        
+        if(rand1 < 1.6/nbstates){
+          //printf("\ndouble : %f\n",rand1);
+          res.addTransition(s.first,c,ss.first);
+        }
+      }
+    }
+  }
+
+  for(int i=0;i<nbstates;i++){
+    double rand1 = rand() / (double)RAND_MAX;
+    if(rand1 < 0.5){
+      res.setStateFinal(i);
+    }
+  }
+  for(int i=1;i<nbstates;i++){
+    double rand1 = rand() / (double)RAND_MAX;
+    if(rand1 < 0.5){
+      res.setStateInitial(i);
+    }
+  }
+  res.setStateInitial(0);
+
+  return res;
+}
 
 
 
 using namespace std;
 int main(int argc, char **argv){
-
+  srand(time(NULL));
+  fa::Automaton A1=RandomAutomaton(8);
+  fa::Automaton A2=RandomAutomaton(13);
+  A1.dotPrint(std::cout);
+  A2.dotPrint(std::cout);
+  return 0;
   // fa::Automaton A1;
 
   // A1.addSymbol('a');
@@ -729,34 +776,34 @@ int main(int argc, char **argv){
   // A2.addTransition(7,'a',4);
   //A2.dotPrint(std::cout);
   
-  fa::Automaton A2;
-  A2.addSymbol('a');A2.addSymbol('b');
+  //fa::Automaton A2;
+  // A2.addSymbol('a');A2.addSymbol('b');
 
-  for(int i=0;i<14;i++){
-    A2.addState(i);
-  }
-  A2.setStateFinal(8);A2.setStateInitial(0);
-    A2.addTransition(0,'a',1);A2.addTransition(0,'b',1);A2.addTransition(1,'a',2);
-    A2.addTransition(1,'b',2);A2.addTransition(2,'a',3);A2.addTransition(2,'b',9);
-    A2.addTransition(3,'a',4);A2.addTransition(4,'a',5);A2.addTransition(4,'b',5);
-    A2.addTransition(4,'a',11);A2.addTransition(5,'b',6);A2.addTransition(6,'a',7);
-    A2.addTransition(6,'b',7);A2.addTransition(7,'a',8);
-    A2.addTransition(9,'a',10);A2.addTransition(9,'b',10);A2.addTransition(10,'b',11);
-    A2.addTransition(11,'b',12);A2.addTransition(12,'a',13);A2.addTransition(12,'b',13);
-    A2.addTransition(13,'b',8);A2.addTransition(13,'a',8);
+  // for(int i=0;i<14;i++){
+  //   A2.addState(i);
+  // }
+  // A2.setStateFinal(8);A2.setStateInitial(0);
+  //   A2.addTransition(0,'a',1);A2.addTransition(0,'b',1);A2.addTransition(1,'a',2);
+  //   A2.addTransition(1,'b',2);A2.addTransition(2,'a',3);A2.addTransition(2,'b',9);
+  //   A2.addTransition(3,'a',4);A2.addTransition(4,'a',5);A2.addTransition(4,'b',5);
+  //   A2.addTransition(4,'a',11);A2.addTransition(5,'b',6);A2.addTransition(6,'a',7);
+  //   A2.addTransition(6,'b',7);A2.addTransition(7,'a',8);
+  //   A2.addTransition(9,'a',10);A2.addTransition(9,'b',10);A2.addTransition(10,'b',11);
+  //   A2.addTransition(11,'b',12);A2.addTransition(12,'a',13);A2.addTransition(12,'b',13);
+  //   A2.addTransition(13,'b',8);A2.addTransition(13,'a',8);
 
-  fa::Automaton A1;
-  A1.addSymbol('a');A1.addSymbol('b');
-  for(int i=0;i<11;i++){
-    A1.addState(i);
-  }
-  A1.setStateFinal(8);A1.setStateInitial(0);
-    A1.addTransition(0,'a',1);A1.addTransition(0,'b',1);A1.addTransition(1,'a',2);
-    A1.addTransition(1,'b',9);A1.addTransition(2,'a',3);A1.addTransition(9,'b',10);
-    A1.addTransition(3,'a',4);A1.addTransition(4,'b',5);A1.addTransition(5,'b',6);
-    A1.addTransition(10,'a',4);A1.addTransition(6,'a',7);A1.addTransition(7,'a',8);
+  // fa::Automaton A1;
+  // A1.addSymbol('a');A1.addSymbol('b');
+  // for(int i=0;i<11;i++){
+  //   A1.addState(i);
+  // }
+  // A1.setStateFinal(8);A1.setStateInitial(0);
+  //   A1.addTransition(0,'a',1);A1.addTransition(0,'b',1);A1.addTransition(1,'a',2);
+  //   A1.addTransition(1,'b',9);A1.addTransition(2,'a',3);A1.addTransition(9,'b',10);
+  //   A1.addTransition(3,'a',4);A1.addTransition(4,'b',5);A1.addTransition(5,'b',6);
+  //   A1.addTransition(10,'a',4);A1.addTransition(6,'a',7);A1.addTransition(7,'a',8);
 
-    A1.addTransition(4,'a',5); //Transition à ajouter ou enlever si on veut que l'automate soit inclus 
+  //   A1.addTransition(4,'a',5); //Transition à ajouter ou enlever si on veut que l'automate soit inclus 
   int length=8;
 
   std::map<std::string,int> tableOfCorrespondances;
