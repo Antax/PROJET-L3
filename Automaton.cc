@@ -671,16 +671,21 @@ void printTable(std::map<std::string,int> table){
 /*
 Création d'automate random 
 */
+using namespace std;
 fa::Automaton RandomAutomaton(int nbstates){
+
+  ofstream fich("./CreateAutomaton.txt");
   fa::Automaton res;
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
   for(char c : letter){
     res.addSymbol(c);
+    fich << "res.addSymbol('"<<c<<"');"<<"\n";
   }
   for(int i=0;i<nbstates;++i){
     res.addState(i);
+    fich << "res.addState("<<i<<");"<<"\n";
   }
   for(auto s : res.etats){
     for(auto ss : res.etats){
@@ -690,6 +695,7 @@ fa::Automaton RandomAutomaton(int nbstates){
         if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
+          fich << "res.addTransition("<<s.first<<","<<c<<","<<ss.first<<");"<<"\n";
         }
       }
     }
@@ -699,15 +705,18 @@ fa::Automaton RandomAutomaton(int nbstates){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.5){
       res.setStateFinal(i);
+      fich << "res.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.5){
       res.setStateInitial(i);
+      fich << "res.setStateInitial("<<i<<");"<<"\n";
     }
   }
   res.setStateInitial(0);
+  fich<<"res.setStateInitial(0);"<<"\n";
 
   return res;
 }
@@ -717,6 +726,7 @@ fa::Automaton RandomAutomaton(int nbstates){
 using namespace std;
 int main(int argc, char **argv){
   srand(time(NULL));
+  /* CREER L'AUTOMATE INCLUS MANUELLEMENT*/
   fa::Automaton A1=RandomAutomaton(8);
   fa::Automaton A2=RandomAutomaton(13);
   A1.dotPrint(std::cout);
