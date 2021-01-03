@@ -695,7 +695,7 @@ fa::Automaton RandomAutomaton(int nbstates){
         if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
-          fich << "res.addTransition("<<s.first<<","<<c<<","<<ss.first<<");"<<"\n";
+          fich << "res.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
         }
       }
     }
