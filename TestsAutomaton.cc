@@ -550,9 +550,18 @@ namespace fa {
     /**
      * Check if the language of the automaton is empty
      */
-    bool Automaton::isLanguageEmpty() const{
+    bool Automaton::isLanguageEmpty() const{ 
       if(!isValid()){
-        return false;
+        if(states.empty()){
+          return true;
+        }else{
+          for(auto s : states){
+            if (s.isInit && s.isFinal){
+              return false;
+            }
+          }
+        }
+        return true;
       }
       std::set<int> visit;
       auto s=states.begin();
@@ -561,8 +570,9 @@ namespace fa {
           if(s->isFinal){
             return false;
           }
-          return DepthSearchEmpty(s,visit);
-          break;
+          if(DepthSearchEmpty(s,visit)==false){
+            return false;
+          }
         }
         s++;
       }
@@ -619,6 +629,7 @@ namespace fa {
           tab[num_index].push_back(init1[i2]);
           tab[num_index].push_back(init2[i]);
           product.addState(num_index);
+          product.setStateInitial(num_index);
           num_index++;
         }
       }
@@ -628,10 +639,6 @@ namespace fa {
           int existInLhs=0;
           int existInRhs=0;
           int nb=it->second[0];
-            if(lhs.states.find(nb)==lhs.states.end()){//Never go inside, just a precaution
-              printf("\nLa ce n'est pas bon du tout\n");
-              return product;
-            }
             for(auto tr : lhs.states.find(nb)->transitions){
               if(tr.symbol==product.alphabet[i]){
                 curr1.push_back(tr.to);
@@ -639,10 +646,6 @@ namespace fa {
               }
             }
             nb=it->second[1];
-            if(rhs.states.find(nb)==rhs.states.end()){//Never go inside, just a precaution
-              printf("\nLa ce n'est pas bon du tout\n");
-              return product;
-            }
             for(auto tr : rhs.states.find(nb)->transitions){
               if(tr.symbol==product.alphabet[i]){
                 curr2.push_back(tr.to);
@@ -725,13 +728,6 @@ namespace fa {
           }
         }
       }
-      // for(auto s : tab){
-      //   printf("\n %d  : {",s.first);
-      //   for(auto n : s.second){
-      //     printf(" %d ",n);
-      //   }
-      //   printf("}\n");
-      // }
 
       return product;
     }
@@ -741,10 +737,21 @@ namespace fa {
      */
     bool Automaton::hasEmptyIntersectionWith(const Automaton& other) const{
       assert(other.isValid());
-      Automaton product=createProduct(*this,other);
-      if(!product.isValid()){ //Never go inside
+      if(!isValid()){
+        if(isLanguageEmpty()){
+          return true;
+        }else{
+          for(auto s: other.states){
+            if(s.isInit && s.isFinal){
+              return false;
+            }
+          }
+          return true;
+        }
         return true;
       }
+
+       Automaton product=createProduct(*this,other);
       return product.isLanguageEmpty();
     }
 
@@ -834,9 +841,17 @@ namespace fa {
     bool Automaton::isIncludedIn(const Automaton& other) const{
       assert(other.isValid());
       if(!isValid()){
-
+        if(isLanguageEmpty()){
+          return true;
+        }
       }
-      Automaton complement=createComplement(other);
+      Automaton copy=other;
+       for(char symb : alphabet){
+        if(!other.hasSymbol(symb)){
+          copy.addSymbol(symb);
+        }
+      }
+      Automaton complement=createComplement(copy);
       return hasEmptyIntersectionWith(complement);
     }
 
