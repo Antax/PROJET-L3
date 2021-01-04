@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string.h> 
 
 namespace fa{
   Automaton::Automaton() { 
@@ -613,11 +614,124 @@ namespace fa{
         }
       }
     }
-
-
       return product;
     }
 
+    Automaton Automaton::createProduct(const Automaton& lhs,const Automaton& rhs){
+    Automaton result=Automaton();
+    //for each new state, there is the pair of states from lhs and rhs, and a map to represent transitions from those states
+    struct lineOfCorrespondances{
+      std::pair<int,int> pairOfStates;
+      std::multimap<char,std::pair<int,int>> transitions;
+    };
+    std::map<int,struct lineOfCorrespondances> tableOfCorrespondances;
+    //Add all possible letters
+    for(std::vector<char>::const_iterator it=lhs.alphabet.begin();it!=lhs.alphabet.end();++it){
+      if(rhs.hasSymbol(*it)){
+        result.addSymbol(*it);
+      }
+    }
+    int productStatesId=0;
+    //first we add all pairs of initial states and their transitions
+    for(std::map<int,int>::const_iterator itStatesl=lhs.etats.begin();itStatesl!=lhs.etats.end();++itStatesl){
+      if(lhs.isStateInitial(itStatesl->first)){
+        for(std::map<int,int>::const_iterator itStatesr=rhs.etats.begin();itStatesr!=rhs.etats.end();++itStatesr){
+          if(lhs.isStateInitial(itStatesr->first)){
+            lineOfCorrespondances c;
+            std::pair<int,int> pairofstates (itStatesl->first,itStatesr->first);
+            c.pairOfStates=pairofstates;
+            std::multimap<char,std::pair<int,int>> transis;
+            c.transitions=transis;
+            for(std::vector<char>::const_iterator it=result.alphabet.begin();it!=result.alphabet.end();++it){
+              //Pour chaque transi depuis l'etat de gauche dans la paire
+              for(std::multimap<char,int>::const_iterator itLeft=lhs.transis.at(c.pairOfStates.first).begin();itLeft!=lhs.transis.at(c.pairOfStates.first).end();++itLeft){
+                if(itLeft->first==*it){
+                  //Pour chaque transi depuis l'etat de droite dans la paire
+                  for(std::multimap<char,int>::const_iterator itRight=rhs.transis.at(c.pairOfStates.second).begin();itRight!=rhs.transis.at(c.pairOfStates.second).end();++itRight){
+                    if(itRight->first==*it){
+                      std::pair<int,int> resultState(itLeft->second,itRight->second);
+                      c.transitions.insert(std::pair<char,std::pair<int,int>>(*it,resultState));
+                    }   
+                  }
+                }
+              }
+            }
+            tableOfCorrespondances.insert(std::pair<int,struct lineOfCorrespondances>(productStatesId,c));
+            ++productStatesId;
+          }
+        }
+      }
+    }
+
+    bool finished=false;
+    //Adding states until finished;
+    while(finished==false){
+      finished=true;
+      for(std::map<int,struct lineOfCorrespondances>::const_iterator it=tableOfCorrespondances.begin();it!=tableOfCorrespondances.end();++it){
+        for(std::map<char,std::pair<int,int>>::const_iterator it2=it->second.transitions.begin();it2!=it->second.transitions.end();it2++){
+          bool alreadyIn=false;
+          for(std::map<int,struct lineOfCorrespondances>::const_iterator it3=tableOfCorrespondances.begin();it3!=tableOfCorrespondances.end();++it3){
+            if(it3->second.pairOfStates==it2->second){
+              alreadyIn=true;
+            }
+          }
+          //Adding the new line
+          if(!alreadyIn){
+            finished=false;
+            lineOfCorrespondances c;
+            c.pairOfStates=it2->second;
+            std::multimap<char,std::pair<int,int>> transis;
+            c.transitions=transis;
+            for(std::vector<char>::const_iterator it=result.alphabet.begin();it!=result.alphabet.end();++it){
+              //Pour chaque transi depuis l'etat de gauche dans la paire
+              for(std::multimap<char,int>::const_iterator itLeft=lhs.transis.at(c.pairOfStates.first).begin();itLeft!=lhs.transis.at(c.pairOfStates.first).end();++itLeft){
+                if(itLeft->first==*it){
+                  //Pour chaque transi depuis l'etat de droite dans la paire
+                  for(std::multimap<char,int>::const_iterator itRight=rhs.transis.at(c.pairOfStates.second).begin();itRight!=rhs.transis.at(c.pairOfStates.second).end();++itRight){
+                    if(itRight->first==*it){
+                      std::pair<int,int> resultState(itLeft->second,itRight->second);
+                      c.transitions.insert(std::pair<char,std::pair<int,int>>(*it,resultState));
+                    }   
+                  }
+                }
+              }
+            }
+            tableOfCorrespondances.insert(std::pair<int,struct lineOfCorrespondances>(productStatesId,c));
+            ++productStatesId;
+          }
+        }
+      }
+    }
+
+    for(std::map<int,struct lineOfCorrespondances>::const_iterator it=tableOfCorrespondances.begin();it!=tableOfCorrespondances.end();++it){
+      result.addState(it->first);
+      if(lhs.isStateInitial(it->second.pairOfStates.first) && rhs.isStateInitial(it->second.pairOfStates.second)){
+        result.setStateInitial(it->first);
+      }
+      if(lhs.isStateFinal(it->second.pairOfStates.first) && rhs.isStateFinal(it->second.pairOfStates.second)){
+        result.setStateFinal(it->first);
+      }
+    }
+    for(std::map<int,struct lineOfCorrespondances>::const_iterator it=tableOfCorrespondances.begin();it!=tableOfCorrespondances.end();++it){
+      for(std::map<char,std::pair<int,int>>::const_iterator it2=it->second.transitions.begin();it2!=it->second.transitions.end();++it2){
+        if(!result.hasSymbol(it2->first)){
+          result.addSymbol(it2->first);
+        }
+        //search for name of "to state"
+        for(std::map<int,struct lineOfCorrespondances>::const_iterator it3=tableOfCorrespondances.begin();it3!=tableOfCorrespondances.end();++it3){
+          if(it3->second.pairOfStates==it2->second){
+            result.addTransition(it->first,it2->first,it3->first);
+          }
+        }
+      }
+    }
+    result.prettyPrint(std::cout);
+    return result;
+  }
+
+  bool Automaton::hasEmptyIntersectionWith(const Automaton& other) const{
+    return createProduct(*this,other).isLanguageEmpty();
+  }
 }
 struct transi{
   int from;
@@ -671,21 +785,16 @@ void printTable(std::map<std::string,int> table){
 /*
 Création d'automate random 
 */
-using namespace std;
 fa::Automaton RandomAutomaton(int nbstates){
-
-  ofstream fich("./CreateAutomaton.txt");
   fa::Automaton res;
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
   for(char c : letter){
     res.addSymbol(c);
-    fich << "res.addSymbol('"<<c<<"');"<<"\n";
   }
   for(int i=0;i<nbstates;++i){
     res.addState(i);
-    fich << "res.addState("<<i<<");"<<"\n";
   }
   for(auto s : res.etats){
     for(auto ss : res.etats){
@@ -695,7 +804,6 @@ fa::Automaton RandomAutomaton(int nbstates){
         if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
-          fich << "res.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
         }
       }
     }
@@ -705,18 +813,15 @@ fa::Automaton RandomAutomaton(int nbstates){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.5){
       res.setStateFinal(i);
-      fich << "res.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.5){
       res.setStateInitial(i);
-      fich << "res.setStateInitial("<<i<<");"<<"\n";
     }
   }
   res.setStateInitial(0);
-  fich<<"res.setStateInitial(0);"<<"\n";
 
   return res;
 }
@@ -725,231 +830,200 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 using namespace std;
 int main(int argc, char **argv){
-  srand(time(NULL));
-  /* CREER L'AUTOMATE INCLUS MANUELLEMENT*/
-  fa::Automaton A1=RandomAutomaton(8);
-  fa::Automaton A2=RandomAutomaton(13);
-  A1.dotPrint(std::cout);
-  A2.dotPrint(std::cout);
- // return 0;
-  // fa::Automaton A1;
-
-  // A1.addSymbol('a');
-  // A1.addSymbol('b');
-
-  // A1.addState(0);
-  // A1.addState(1);
-  // A1.addState(2);
-  // A1.addState(3);
-  // A1.addState(4);
-
-  // A1.setStateInitial(0);
-  // A1.setStateFinal(4);
-
-  // A1.addTransition(0,'a',1);
-  // A1.addTransition(1,'a',2);
-  // A1.addTransition(1,'b',2);
-  // A1.addTransition(2,'a',3);
-  // A1.addTransition(2,'b',3);
-  // A1.addTransition(3,'a',4);
-  // A1.addTransition(3,'b',4);
-  // A1.dotPrint(std::cout);
-
-  // fa::Automaton A2;
-
-  // A2.addSymbol('a');
-  // A2.addSymbol('b');
-
-  // A2.addState(0);
-  // A2.addState(1);
-  // A2.addState(2);
-  // A2.addState(3);
-  // A2.addState(4);
-  // A2.addState(5);
-  // A2.addState(6);
-  // A2.addState(7);
-
-  // A2.setStateInitial(0);
-  // A2.setStateFinal(4);
-
-  // A2.addTransition(0,'a',1);
-  // A2.addTransition(1,'a',2);
-  // A2.addTransition(2,'a',3);
-  // A2.addTransition(2,'b',3);
-  // A2.addTransition(3,'a',4);
-  // A2.addTransition(3,'b',4);
-  // A2.addTransition(0,'b',5);
-  // A2.addTransition(5,'a',6);
-  // A2.addTransition(5,'b',6);
-  // A2.addTransition(6,'a',7);
-  // A2.addTransition(6,'b',7);
-  // A2.addTransition(7,'a',4);
-  //A2.dotPrint(std::cout);
-  
-  //fa::Automaton A2;
-  // A2.addSymbol('a');A2.addSymbol('b');
-
-  // for(int i=0;i<14;i++){
-  //   A2.addState(i);
-  // }
-  // A2.setStateFinal(8);A2.setStateInitial(0);
-  //   A2.addTransition(0,'a',1);A2.addTransition(0,'b',1);A2.addTransition(1,'a',2);
-  //   A2.addTransition(1,'b',2);A2.addTransition(2,'a',3);A2.addTransition(2,'b',9);
-  //   A2.addTransition(3,'a',4);A2.addTransition(4,'a',5);A2.addTransition(4,'b',5);
-  //   A2.addTransition(4,'a',11);A2.addTransition(5,'b',6);A2.addTransition(6,'a',7);
-  //   A2.addTransition(6,'b',7);A2.addTransition(7,'a',8);
-  //   A2.addTransition(9,'a',10);A2.addTransition(9,'b',10);A2.addTransition(10,'b',11);
-  //   A2.addTransition(11,'b',12);A2.addTransition(12,'a',13);A2.addTransition(12,'b',13);
-  //   A2.addTransition(13,'b',8);A2.addTransition(13,'a',8);
-
-  // fa::Automaton A1;
-  // A1.addSymbol('a');A1.addSymbol('b');
-  // for(int i=0;i<11;i++){
-  //   A1.addState(i);
-  // }
-  // A1.setStateFinal(8);A1.setStateInitial(0);
-  //   A1.addTransition(0,'a',1);A1.addTransition(0,'b',1);A1.addTransition(1,'a',2);
-  //   A1.addTransition(1,'b',9);A1.addTransition(2,'a',3);A1.addTransition(9,'b',10);
-  //   A1.addTransition(3,'a',4);A1.addTransition(4,'b',5);A1.addTransition(5,'b',6);
-  //   A1.addTransition(10,'a',4);A1.addTransition(6,'a',7);A1.addTransition(7,'a',8);
-
-  //   A1.addTransition(4,'a',5); //Transition à ajouter ou enlever si on veut que l'automate soit inclus 
-  int length=8;
-
-  std::map<std::string,int> tableOfCorrespondances;
-  //index is used to insert elements
-  int tableIndex=1;
-  
-  //Ajout des variables pour representer le mot : a4 = la 4eme lettre du mot est a
-  for(std::vector<char>::const_iterator it=A1.alphabet.begin();it!=A1.alphabet.end();++it){
-    for(int i=1;i<=length;++i){
-      std::string value="";
-      value.push_back(*it);
-      value+=" "+std::to_string(i);
-      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
-      tableIndex++;
-    }
-  }
-
-  //Ajout des variables pour representer un etat(A1) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
-  for(std::map<int,int>::const_iterator it=A1.etats.begin();it!=A1.etats.end();it++){
-    for(int i=0;i<=length;++i){
-      std::string value="A1 "+std::to_string(it->first)+" "+std::to_string(i);
-      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
-      tableIndex++;
-    }
-  }
-
-  //Ajout des variables pour representer un etat(A2) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
-  for(std::map<int,int>::const_iterator it=A2.etats.begin();it!=A2.etats.end();it++){
-    for(int i=0;i<=length;++i){
-      std::string value="A2 "+std::to_string(it->first)+" "+std::to_string(i);
-      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
-      tableIndex++;
-    }
-  }
-
-  printTable(tableOfCorrespondances);
-
-  ofstream cnfFile;
-  cnfFile.open("test.cnf");
-  cnfFile << "p cnf " << tableIndex << " 0 \n";
-  /**************************Word is in A1*************************************/
-  
-  //at each place in the word, only a or only or b
-  for(int i=1;i<=length;++i){
-    cnfFile << satValueWord(tableOfCorrespondances,'a',i) << " " << satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
-    cnfFile << "-" << satValueWord(tableOfCorrespondances,'a',i) << " -" <<satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
-  }
-
-  //Starts with an initial state
-  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
-    if(A1.isStateInitial(state->first)){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,0) << " ";
-    }
-  }
-  cnfFile << "0\n";
-
-  //Ends with a final state
-  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
-    if(A1.isStateFinal(state->first)){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,length) << " ";
-    }
-  }
-  cnfFile << "0\n";
-
-  //Max one state per step
-  for(int step=0;step<=length;++step){
-    for(size_t state=0;state<A1.countStates()-1;++state){
-      for(size_t state2=state+1;state2<A1.countStates();++state2){
-        cnfFile <<"-"<< satValueAutomatons(tableOfCorrespondances,1,state,step) << " -"<<satValueAutomatons(tableOfCorrespondances,1,state2,step) << " 0\n";
+  int length=10;
+  if(argc==1){
+    std::map<int,int> result;
+    string line;
+    ifstream outFile ("test.out");
+    if (outFile.is_open()){
+      while(getline(outFile,line)){
+        if(line.compare("UNSAT")==0){
+          cout << "A1 is included in A2\n";
+          return 1;
+        }
+        cout << "A1 is not included in A2\n";
+        if(!line.compare("SAT")==0){
+          for(int i=0;i<length*2;++i){
+            std::string var=split(line,' ',i);
+            if (var.at(0)!='-'){
+              if(stoi(var)<length/2){
+                cout<< "a";
+              }else{
+                cout<<"b";
+              }
+            }
+          }
+        }
       }
+      cout << "\n";
+      outFile.close();
     }
-  }
+  }else{
+    
+      srand(time(NULL));
 
-  //At least one state per step
-  for(int step=0;step<=length;++step){
-    for(size_t state=0;state<A1.countStates();++state){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state,step) << " ";
-    }
-    cnfFile << "0\n";
-  }
+      //Automate reconnaissant tous les mots
+      fa::Automaton A1;
 
-  //word follows A1's transitions
-  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
-    std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
-    std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
-    for(int step=0;step<length;++step){
-      cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
-      for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
-        cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
-      }
-      cnfFile<<" 0\n";
+      A1.addSymbol('a');
+      A1.addSymbol('b');
 
-      cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
-      for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
-        cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
-      }
-      cnfFile<<" 0\n";
-    }
-  }
+      A1.addState(0);
 
-  /**** Rules of A2  ****/
+      A1.setStateInitial(0);
+      A1.setStateFinal(0);
 
-  //Starts with an initial state
-  for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
-    if(A2.isStateInitial(state->first)){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " ";
-    }
-  }
-  cnfFile << "0\n";
+      A1.addTransition(0,'a',0);
+      A1.addTransition(0,'b',0);
 
-  //Accessible States
-  for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
-    std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
-    std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
-    for(int step=0;step<length;step++){
+      fa::Automaton A2=RandomAutomaton(10);
+      /*A1.dotPrint(std::cout);
+      A2.dotPrint(std::cout);*/
+    if(strcmp(argv[1],"--sat")==0){
 
-      for(auto to : destinationsA){
-        cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
-        cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
-        cnfFile<<" 0\n";
-       }
+      std::map<std::string,int> tableOfCorrespondances;
+      //index is used to insert elements
+      int tableIndex=1;
       
-      for(auto to : destinationsB){
-        cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
-        cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
-        cnfFile<<" 0\n";
+      //Ajout des variables pour representer le mot : a4 = la 4eme lettre du mot est a
+      for(std::vector<char>::const_iterator it=A1.alphabet.begin();it!=A1.alphabet.end();++it){
+        for(int i=1;i<=length;++i){
+          std::string value="";
+          value.push_back(*it);
+          value+=" "+std::to_string(i);
+          tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+          tableIndex++;
+        }
       }
+
+      //Ajout des variables pour representer un etat(A1) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
+      for(std::map<int,int>::const_iterator it=A1.etats.begin();it!=A1.etats.end();it++){
+        for(int i=0;i<=length;++i){
+          std::string value="A1 "+std::to_string(it->first)+" "+std::to_string(i);
+          tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+          tableIndex++;
+        }
+      }
+
+      //Ajout des variables pour representer un etat(A2) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
+      for(std::map<int,int>::const_iterator it=A2.etats.begin();it!=A2.etats.end();it++){
+        for(int i=0;i<=length;++i){
+          std::string value="A2 "+std::to_string(it->first)+" "+std::to_string(i);
+          tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+          tableIndex++;
+        }
+      }
+
+      //printTable(tableOfCorrespondances);
+
+      ofstream cnfFile;
+      cnfFile.open("test.cnf");
+      cnfFile << "p cnf " << tableIndex << " 0 \n";
+      /**************************Word is in A1*************************************/
       
+      //at each place in the word, only a or only or b
+      for(int i=1;i<=length;++i){
+        cnfFile << satValueWord(tableOfCorrespondances,'a',i) << " " << satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+        cnfFile << "-" << satValueWord(tableOfCorrespondances,'a',i) << " -" <<satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+      }
+
+      //Starts with an initial state
+      for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+        if(A1.isStateInitial(state->first)){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,0) << " ";
+        }
+      }
+      cnfFile << "0\n";
+
+      //Ends with a final state
+      for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+        if(A1.isStateFinal(state->first)){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,length) << " ";
+        }
+      }
+      cnfFile << "0\n";
+
+      //Max one state per step
+      for(int step=0;step<=length;++step){
+        for(size_t state=0;state<A1.countStates()-1;++state){
+          for(size_t state2=state+1;state2<A1.countStates();++state2){
+            cnfFile <<"-"<< satValueAutomatons(tableOfCorrespondances,1,state,step) << " -"<<satValueAutomatons(tableOfCorrespondances,1,state2,step) << " 0\n";
+          }
+        }
+      }
+
+      //At least one state per step
+      for(int step=0;step<=length;++step){
+        for(size_t state=0;state<A1.countStates();++state){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state,step) << " ";
+        }
+        cnfFile << "0\n";
+      }
+
+      //word follows A1's transitions
+      for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+        std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
+        std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
+        for(int step=0;step<length;++step){
+          cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+          for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
+            cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+          }
+          cnfFile<<" 0\n";
+
+          cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+          for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
+            cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+          }
+          cnfFile<<" 0\n";
+        }
+      }
+
+      /**** Rules of A2  ****/
+
+      //Starts with an initial state
+      for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
+        if(A2.isStateInitial(state->first)){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " ";
+        }
+      }
+      cnfFile << "0\n";
+
+      //Accessible States
+      for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
+        std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
+        std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
+        for(int step=0;step<length;step++){
+
+          for(auto to : destinationsA){
+            cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+            cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+            cnfFile<<" 0\n";
+          }
+          
+          for(auto to : destinationsB){
+            cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+            cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+            cnfFile<<" 0\n";
+          }
+          
+        }
+      }
+
+      //isNotFinalState
+      for(auto state : A2.etats){
+        if(A2.isStateFinal(state.first)){
+            cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
+        }
+      }
+    }else{
+      cout << "here";
+      fa::Automaton deterministic=A2.createDeterministic(A2);
+      fa::Automaton complement=deterministic.createComplement(deterministic);
+      if(complement.hasEmptyIntersectionWith(A1)){
+        cout<<"included";
+      }else{
+        cout<<"not included";
+      }
     }
   }
-
-  //isNotFinalState
-  for(auto state : A2.etats){
-    if(A2.isStateFinal(state.first)){
-        cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
-    }
-  }
-
-}
