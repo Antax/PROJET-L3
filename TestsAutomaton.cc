@@ -477,13 +477,9 @@ namespace fa {
       Automaton copy=automaton;
       if(!copy.isDeterministic()){
         copy=createDeterministic(copy);
-        printf("deter\n");
-            copy.dotPrint(std::cout);
       }
       //test if is already complete in createComplete
       copy=createComplete(copy);
-      printf("complet\n");
-            copy.dotPrint(std::cout);
       for(auto &s : copy.states){
         if(s.isFinal){
           s.isFinal=false;
@@ -492,8 +488,6 @@ namespace fa {
         }
       }
       return copy;
-      printf("complement\n");
-            copy.dotPrint(std::cout);
 
     }
 
@@ -736,7 +730,6 @@ namespace fa {
 
       //Search the final state
       for(auto e : tab){
-        printf("{ %d , %d }\n",e.second[0],e.second[1]);
         if(lhs.isStateFinal(e.second[0])){
           if(rhs.isStateFinal(e.second[1])){
             product.setStateFinal(e.first);
@@ -768,7 +761,6 @@ namespace fa {
       if(!product.isValid()){ //Never go inside
         return true;
       }
-      product.dotPrint(std::cout);
       return product.isLanguageEmpty();
     }
 
@@ -938,7 +930,36 @@ int main(int argc, char **argv){
 
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
-  fa::Automaton A2=RandomAutomaton(5);
+ // fa::Automaton A2=RandomAutomaton(5);
+ fa::Automaton A2;
+ A2.addSymbol('a');
+A2.addSymbol('b');
+A2.addState(0);
+A2.addState(1);
+A2.addState(2);
+A2.addState(3);
+A2.addState(4);
+A2.addTransition(0,'b',2);
+A2.addTransition(0,'a',4);
+A2.addTransition(1,'a',4);
+A2.addTransition(2,'a',0);
+A2.addTransition(2,'b',0);
+A2.addTransition(2,'a',1);
+A2.addTransition(2,'a',2);
+A2.addTransition(2,'a',3);
+A2.addTransition(2,'b',3);
+A2.addTransition(2,'b',4);
+A2.addTransition(3,'b',1);
+A2.addTransition(3,'a',4);
+A2.addTransition(4,'a',2);
+A2.addTransition(4,'a',4);
+A2.setStateFinal(1);
+A2.setStateFinal(2);
+A2.setStateInitial(1);
+A2.setStateInitial(2);
+A2.setStateInitial(3);
+A2.setStateInitial(4);
+A2.setStateInitial(0);
   A2.dotPrint(std::cout);
     if(A1.isIncludedIn(A2)){
         printf("Automaton A1 is Include in A2 : True \n");
