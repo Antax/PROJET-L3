@@ -774,7 +774,7 @@ A2.setStateInitial(0);
  // A2.dotPrint(std::cout);
  // return 0;
   
-  int length=30;
+  int length=5;
 
   std::map<std::string,int> tableOfCorrespondances;
   //index is used to insert elements
