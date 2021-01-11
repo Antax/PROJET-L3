@@ -99,11 +99,11 @@ namespace fa {
     
 };
   
-  std::vector<char>alphabet;
-  std::set<State,StateCompare>states;
+  
   
   public:
-  
+  std::vector<char>alphabet;
+  std::set<State,StateCompare>states;
     /**
      * Build an empty automaton (no state, no transition).
      */

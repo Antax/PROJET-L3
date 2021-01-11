@@ -447,7 +447,7 @@ namespace fa {
         return automaton;
       }
       Automaton copy=automaton;
-      int n=(copy.states.end()->nb)+1; // Adding a trash state 
+      int n=(copy.states.end()->nb)+1; // Adding a trash state  : states is sorted
       copy.addState(n);
       for(auto s : copy.states){
         for(auto l : copy.alphabet){
@@ -477,10 +477,13 @@ namespace fa {
       Automaton copy=automaton;
       if(!copy.isDeterministic()){
         copy=createDeterministic(copy);
+        printf("deter\n");
+            copy.dotPrint(std::cout);
       }
       //test if is already complete in createComplete
       copy=createComplete(copy);
-      
+      printf("complet\n");
+            copy.dotPrint(std::cout);
       for(auto &s : copy.states){
         if(s.isFinal){
           s.isFinal=false;
@@ -489,6 +492,9 @@ namespace fa {
         }
       }
       return copy;
+      printf("complement\n");
+            copy.dotPrint(std::cout);
+
     }
 
     /**
@@ -639,6 +645,10 @@ namespace fa {
           int existInLhs=0;
           int existInRhs=0;
           int nb=it->second[0];
+            if(lhs.states.find(nb)==lhs.states.end()){//Never go inside, just a precaution
+              //printf("\nLa ce n'est pas bon du tout\n");
+              return product;
+            }
             for(auto tr : lhs.states.find(nb)->transitions){
               if(tr.symbol==product.alphabet[i]){
                 curr1.push_back(tr.to);
@@ -646,6 +656,10 @@ namespace fa {
               }
             }
             nb=it->second[1];
+            if(rhs.states.find(nb)==rhs.states.end()){//Never go inside, just a precaution
+              //printf("\nLa ce n'est pas bon du tout\n");
+              return product;
+            }
             for(auto tr : rhs.states.find(nb)->transitions){
               if(tr.symbol==product.alphabet[i]){
                 curr2.push_back(tr.to);
@@ -722,20 +736,20 @@ namespace fa {
 
       //Search the final state
       for(auto e : tab){
+        printf("{ %d , %d }\n",e.second[0],e.second[1]);
         if(lhs.isStateFinal(e.second[0])){
           if(rhs.isStateFinal(e.second[1])){
             product.setStateFinal(e.first);
           }
         }
       }
-
       return product;
     }
 
     /**
      * Tell if the intersection with another automaton is empty
      */
-    bool Automaton::hasEmptyIntersectionWith(const Automaton& other) const{
+   bool Automaton::hasEmptyIntersectionWith(const Automaton& other) const{
       assert(other.isValid());
       if(!isValid()){
         if(isLanguageEmpty()){
@@ -750,8 +764,11 @@ namespace fa {
         }
         return true;
       }
-
        Automaton product=createProduct(*this,other);
+      if(!product.isValid()){ //Never go inside
+        return true;
+      }
+      product.dotPrint(std::cout);
       return product.isLanguageEmpty();
     }
 
@@ -840,6 +857,7 @@ namespace fa {
      */
     bool Automaton::isIncludedIn(const Automaton& other) const{
       assert(other.isValid());
+
       if(!isValid()){
         if(isLanguageEmpty()){
           return true;
@@ -858,36 +876,70 @@ namespace fa {
 }
 
 using namespace std;
+fa::Automaton RandomAutomaton(int nbstates){
+
+  ofstream fich("./CreateAutomaton.txt");
+  fa::Automaton res;
+  std::vector<char> letter;
+  letter.push_back('a');
+  letter.push_back('b');
+  for(char c : letter){
+    res.addSymbol(c);
+    fich << "res.addSymbol('"<<c<<"');"<<"\n";
+  }
+  for(int i=0;i<nbstates;++i){
+    res.addState(i);
+    fich << "res.addState("<<i<<");"<<"\n";
+  }
+  for(auto s : res.states){
+    for(auto ss : res.states){
+      for(char c : letter){
+        double rand1 = rand() / (double)RAND_MAX;
+        
+        if(rand1 < 1.6/nbstates){
+          res.addTransition(s.nb,c,ss.nb);
+          fich << "res.addTransition("<<s.nb<<",'"<<c<<"',"<<ss.nb<<");"<<"\n";
+        }
+      }
+    }
+  }
+
+  for(int i=0;i<nbstates;i++){
+    double rand1 = rand() / (double)RAND_MAX;
+    if(rand1 < 0.5){
+      res.setStateFinal(i);
+      fich << "res.setStateFinal("<<i<<");"<<"\n";
+    }
+  }
+  for(int i=1;i<nbstates;i++){
+    double rand1 = rand() / (double)RAND_MAX;
+    if(rand1 < 0.5){
+      res.setStateInitial(i);
+      fich << "res.setStateInitial("<<i<<");"<<"\n";
+    }
+  }
+  res.setStateInitial(0);
+  fich<<"res.setStateInitial(0);"<<"\n";
+
+  return res;
+}
+
 int main(int argc, char **argv){
 
-  fa::Automaton A2;
-  A2.addSymbol('a');A2.addSymbol('b');
+   fa::Automaton A1;
 
-  for(int i=0;i<14;i++){
-    A2.addState(i);
-  }
-  A2.setStateFinal(8);A2.setStateInitial(0);
-    A2.addTransition(0,'a',1);A2.addTransition(0,'b',1);A2.addTransition(1,'a',2);
-    A2.addTransition(1,'b',2);A2.addTransition(2,'a',3);A2.addTransition(2,'b',9);
-    A2.addTransition(3,'a',4);A2.addTransition(4,'a',5);A2.addTransition(4,'b',5);
-    A2.addTransition(4,'a',11);A2.addTransition(5,'b',6);A2.addTransition(6,'a',7);
-    A2.addTransition(6,'b',7);A2.addTransition(7,'a',8);
-    A2.addTransition(9,'a',10);A2.addTransition(9,'b',10);A2.addTransition(10,'b',11);
-    A2.addTransition(11,'b',12);A2.addTransition(12,'a',13);A2.addTransition(12,'b',13);
-    A2.addTransition(13,'b',8);A2.addTransition(13,'a',8);
+      A1.addSymbol('a');
+      A1.addSymbol('b');
 
-  fa::Automaton A1;
-  A1.addSymbol('a');A1.addSymbol('b');
-  for(int i=0;i<11;i++){
-    A1.addState(i);
-  }
-  A1.setStateFinal(8);A1.setStateInitial(0);
-    A1.addTransition(0,'a',1);A1.addTransition(0,'b',1);A1.addTransition(1,'a',2);
-    A1.addTransition(1,'b',9);A1.addTransition(2,'a',3);A1.addTransition(9,'b',10);
-    A1.addTransition(3,'a',4);A1.addTransition(4,'b',5);A1.addTransition(5,'b',6);
-    A1.addTransition(10,'a',4);A1.addTransition(6,'a',7);A1.addTransition(7,'a',8);
+      A1.addState(0);
 
-    A1.addTransition(4,'a',5); //Transition à ajouter ou enlever si on veut que l'automate soit inclus 
+      A1.setStateInitial(0);
+      A1.setStateFinal(0);
+
+      A1.addTransition(0,'a',0);
+      A1.addTransition(0,'b',0);
+  fa::Automaton A2=RandomAutomaton(5);
+  A2.dotPrint(std::cout);
     if(A1.isIncludedIn(A2)){
         printf("Automaton A1 is Include in A2 : True \n");
     }else{
