@@ -740,12 +740,12 @@ int main(int argc, char **argv){
 
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
-  fa::Automaton A2=RandomAutomaton(30);
+  fa::Automaton A2=RandomAutomaton(50);
   //A1.dotPrint(std::cout);
  // A2.dotPrint(std::cout);
  // return 0;
   
-  int length=30;
+  int length=50;
 
   std::map<std::string,int> tableOfCorrespondances;
   //index is used to insert elements
@@ -862,38 +862,37 @@ int main(int argc, char **argv){
   for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
    std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
     std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
-  //   for(int step=0;step<length;step++){
+    // for(int step=0;step<length;step++){
 
-  //     for(auto to : destinationsA){
-  //       cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
-  //       cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
-  //       cnfFile<<" 0\n";
-  //      }
+    //   for(auto to : destinationsA){
+    //     cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+    //     cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+    //     cnfFile<<" 0\n";
+    //    }
       
-  //     for(auto to : destinationsB){
-  //       cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
-  //       cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
-  //       cnfFile<<" 0\n";
-  //     }// std::string index="";index.push_back(letter);
-  // // index+=" "+std::to_string(pos);
-  // // return tableOfCorrespondances1[index];
+    //   for(auto to : destinationsB){
+    //     cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+    //     cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+    //     cnfFile<<" 0\n";
+    //   }
       
-  //   }
+    // }
+
   for(int step=0;step<length;step++){
 
       for(auto to : destinationsA){
-        std::string index="A2 ";index+=std::to_string(to)+" "+std::to_string(step); //satValueAutomatons
+        std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
         std::string index2="";index2.push_back('a');index2+=" "+std::to_string(step+1); //satValuWord
-        std::string index3="A2 ";index+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
+        std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
         cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
         cnfFile << " " << tableOfCorrespondances[index3];
         cnfFile<<" 0\n";
        }
       
       for(auto to : destinationsB){
-        std::string index="A2 ";index+=std::to_string(to)+" "+std::to_string(step); //satValueAutomatons
+        std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
         std::string index2="";index2.push_back('b');index2+=" "+std::to_string(step+1); //satValueWord
-        std::string index3="A2 ";index+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
+        std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
         cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
         cnfFile << " " << tableOfCorrespondances[index3];
         cnfFile<<" 0\n";
