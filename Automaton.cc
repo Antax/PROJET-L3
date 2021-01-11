@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include <string.h> 
 namespace fa{
   Automaton::Automaton() { 
     
@@ -726,7 +726,38 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 using namespace std;
 int main(int argc, char **argv){
-  srand(time(NULL));
+  
+  
+  int length=5;
+  if(argc==1){
+    std::map<int,int> result;
+    string line;
+    ifstream outFile ("test.out");
+    if (outFile.is_open()){
+      while(getline(outFile,line)){
+        if(line.compare("UNSAT")==0){
+          cout << "A1 is included in A2\n";
+          return 1;
+        }
+        cout << "A1 is not included in A2\n";
+        if(!line.compare("SAT")==0){
+          for(int i=0;i<length*2;++i){
+            std::string var=split(line,' ',i);
+            if (var.at(0)!='-'){
+              if(stoi(var)<length/2){
+                cout<< "a";
+              }else{
+                cout<<"b";
+              }
+            }
+          }
+        }
+      }
+      cout << "\n";
+      outFile.close();
+    }
+  }else{
+      srand(time(NULL));
   //Automate reconnaissant tous les mots
       fa::Automaton A1;
 
@@ -740,220 +771,199 @@ int main(int argc, char **argv){
 
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
-  //fa::Automaton A2=RandomAutomaton(30);
-  fa::Automaton A2;
- A2.addSymbol('a');
-A2.addSymbol('b');
-A2.addState(0);
-A2.addState(1);
-A2.addState(2);
-A2.addState(3);
-A2.addState(4);
-A2.addTransition(0,'b',2);
-A2.addTransition(0,'a',4);
-A2.addTransition(1,'a',4);
-A2.addTransition(2,'a',0);
-A2.addTransition(2,'b',0);
-A2.addTransition(2,'a',1);
-A2.addTransition(2,'a',2);
-A2.addTransition(2,'a',3);
-A2.addTransition(2,'b',3);
-A2.addTransition(2,'b',4);
-A2.addTransition(3,'b',1);
-A2.addTransition(3,'a',4);
-A2.addTransition(4,'a',2);
-A2.addTransition(4,'a',4);
-A2.setStateFinal(1);
-A2.setStateFinal(2);
-A2.setStateInitial(1);
-A2.setStateInitial(2);
-A2.setStateInitial(3);
-A2.setStateInitial(4);
-A2.setStateInitial(0);
-  //A1.dotPrint(std::cout);
- // A2.dotPrint(std::cout);
- // return 0;
-  
-  int length=5;
+        //fa::Automaton A2=RandomAutomaton(30);
+      fa::Automaton A2;
+      A2.addSymbol('a');
+      A2.addSymbol('b');
+      A2.addState(0);
+      A2.addState(1);
+      A2.addState(2);
+      A2.addState(3);
+      A2.addState(4);
+      A2.addTransition(0,'b',2);
+      A2.addTransition(0,'a',4);
+      A2.addTransition(1,'a',4);
+      A2.addTransition(2,'a',0);
+      A2.addTransition(2,'b',0);
+      A2.addTransition(2,'a',1);
+      A2.addTransition(2,'a',2);
+      A2.addTransition(2,'a',3);
+      A2.addTransition(2,'b',3);
+      A2.addTransition(2,'b',4);
+      A2.addTransition(3,'b',1);
+      A2.addTransition(3,'a',4);
+      A2.addTransition(4,'a',2);
+      A2.addTransition(4,'a',4);
+      A2.setStateFinal(1);
+      A2.setStateFinal(2);
+      A2.setStateInitial(1);
+      A2.setStateInitial(2);
+      A2.setStateInitial(3);
+      A2.setStateInitial(4);
+      A2.setStateInitial(0);
+        //A1.dotPrint(std::cout);
+      // A2.dotPrint(std::cout);
+      // return 0;
+    if(strcmp(argv[1],"--sat")==0){
 
-  std::map<std::string,int> tableOfCorrespondances;
-  //index is used to insert elements
-  int tableIndex=1;
-  
-  //Ajout des variables pour representer le mot : a4 = la 4eme lettre du mot est a
-  for(std::vector<char>::const_iterator it=A1.alphabet.begin();it!=A1.alphabet.end();++it){
-    for(int i=1;i<=length;++i){
-      std::string value="";
-      value.push_back(*it);
-      value+=" "+std::to_string(i);
-      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
-      tableIndex++;
-    }
-  }
-
-  //Ajout des variables pour representer un etat(A1) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
-  for(std::map<int,int>::const_iterator it=A1.etats.begin();it!=A1.etats.end();it++){
-    for(int i=0;i<=length;++i){
-      std::string value="A1 "+std::to_string(it->first)+" "+std::to_string(i);
-      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
-      tableIndex++;
-    }
-  }
-
-  //Ajout des variables pour representer un etat(A2) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
-  for(std::map<int,int>::const_iterator it=A2.etats.begin();it!=A2.etats.end();it++){
-    for(int i=0;i<=length;++i){
-      std::string value="A2 "+std::to_string(it->first)+" "+std::to_string(i);
-      tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
-      tableIndex++;
-    }
-  }
-
-  printTable(tableOfCorrespondances);
-
-  ofstream cnfFile;
-  cnfFile.open("test.cnf");
-  cnfFile << "p cnf " << tableIndex << " 0 \n";
-  /**************************Word is in A1*************************************/
-  
-  //at each place in the word, only a or only or b
-  for(int i=1;i<=length;++i){
-    cnfFile << satValueWord(tableOfCorrespondances,'a',i) << " " << satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
-    cnfFile << "-" << satValueWord(tableOfCorrespondances,'a',i) << " -" <<satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
-  }
-
-  //Starts with an initial state
-  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
-    if(A1.isStateInitial(state->first)){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,0) << " ";
-    }
-  }
-  cnfFile << "0\n";
-
-  //Ends with a final state
-  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
-    if(A1.isStateFinal(state->first)){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,length) << " ";
-    }
-  }
-  cnfFile << "0\n";
-
-  //Max one state per step
-  for(int step=0;step<=length;++step){
-    for(size_t state=0;state<A1.countStates()-1;++state){
-      for(size_t state2=state+1;state2<A1.countStates();++state2){
-       // cnfFile <<"-"<< satValueAutomatons(tableOfCorrespondances,1,state,step) << " -"<<satValueAutomatons(tableOfCorrespondances,1,state2,step) << " 0\n";
-      }
-    }
-  }
-
-  //At least one state per step
-  for(int step=0;step<=length;++step){
-    for(size_t state=0;state<A1.countStates();++state){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,1,state,step) << " ";
-    }
-    cnfFile << "0\n";
-  }
-
-  //word follows A1's transitions
-  for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
-    std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
-    std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
-    // for(int step=0;step<length;++step){
-    //   cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
-    //   for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
-    //     cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
-    //   }
-    //   cnfFile<<" 0\n";
-
-    //   cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
-    //   for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
-    //     cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
-    //   }
-    //   cnfFile<<" 0\n";
-    // }
-
-    for(int step=0;step<length;++step){
-      std::string index="A1 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
-        std::string index2="";index2.push_back('a');index2+=" "+std::to_string(step+1); //satValuWord
-        
-
-      cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
-      for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
-        std::string index3="A1 ";index3+=std::to_string(*to)+" "+std::to_string(step+1); //satValueAutomatons
-        cnfFile << " "<<tableOfCorrespondances[index3];
-      }
-      cnfFile<<" 0\n";
-
-      index2="";index2.push_back('b');index2+=" "+std::to_string(step+1); //satValuWord
-      cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
-      for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
-        std::string index3="A1 ";index3+=std::to_string(*to)+" "+std::to_string(step+1); //satValueAutomatons
-        cnfFile << " "<<tableOfCorrespondances[index3];
-      }
-      cnfFile<<" 0\n";
-    }   
-
-  }
-
-  /**** Rules of A2  ****/
-
-  //Starts with an initial state
-  for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
-    if(A2.isStateInitial(state->first)){
-      cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " ";
-    }
-  }
-  cnfFile << "0\n";
-
-  //Accessible States
-  for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
-   std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
-    std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
-    // for(int step=0;step<length;step++){
-
-    //   for(auto to : destinationsA){
-    //     cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
-    //     cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
-    //     cnfFile<<" 0\n";
-    //    }
+      std::map<std::string,int> tableOfCorrespondances;
+      //index is used to insert elements
+      int tableIndex=1;
       
-    //   for(auto to : destinationsB){
-    //     cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
-    //     cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
-    //     cnfFile<<" 0\n";
-    //   }
-      
-    // }
-
-  for(int step=0;step<length;step++){
-
-      for(auto to : destinationsA){
-        std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
-        std::string index2="";index2.push_back('a');index2+=" "+std::to_string(step+1); //satValuWord
-        std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
-        cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
-        cnfFile << " " << tableOfCorrespondances[index3];
-        cnfFile<<" 0\n";
-       }
-      
-      for(auto to : destinationsB){
-        std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
-        std::string index2="";index2.push_back('b');index2+=" "+std::to_string(step+1); //satValueWord
-        std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
-        cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
-        cnfFile << " " << tableOfCorrespondances[index3];
-        cnfFile<<" 0\n";
+      //clock_t c2 =clock();
+      //Ajout des variables pour representer le mot : a4 = la 4eme lettre du mot est a
+      for(std::vector<char>::const_iterator it=A1.alphabet.begin();it!=A1.alphabet.end();++it){
+        for(int i=1;i<=length;++i){
+          std::string value="";
+          value.push_back(*it);
+          value+=" "+std::to_string(i);
+          tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+          tableIndex++;
+        }
       }
+      //printf("C2 : %.2fs \n",(double)(clock()-c2)/CLOCKS_PER_SEC);
+
+      //clock_t c3=clock();
+      //Ajout des variables pour representer un etat(A1) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
+      for(std::map<int,int>::const_iterator it=A1.etats.begin();it!=A1.etats.end();it++){
+        for(int i=0;i<=length;++i){
+          std::string value="A1 "+std::to_string(it->first)+" "+std::to_string(i);
+          tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+          tableIndex++;
+        }
+      }
+      //printf("C3 : %.2fs \n",(double)(clock()-c3)/CLOCKS_PER_SEC);
+
+      //clock_t c4=clock();
+      //Ajout des variables pour representer un etat(A2) a une etape : 2 7 = Le chemin passe par l'etat 2 de A1 a l'etape 7
+      for(std::map<int,int>::const_iterator it=A2.etats.begin();it!=A2.etats.end();it++){
+        for(int i=0;i<=length;++i){
+          std::string value="A2 "+std::to_string(it->first)+" "+std::to_string(i);
+          tableOfCorrespondances.insert(std::pair<std::string,int>(value,tableIndex));
+          tableIndex++;
+        }
+      }
+      //printf("C4 : %.2fs \n",(double)(clock()-c4)/CLOCKS_PER_SEC);
+
+      //printTable(tableOfCorrespondances);
+
+      ofstream cnfFile;
+      cnfFile.open("test.cnf");
+      cnfFile << "p cnf " << tableIndex << " 0 \n";
+      /**************************Word is in A1*************************************/
+      //clock_t c5=clock();
+      //at each place in the word, only a or only or b
+      for(int i=1;i<=length;++i){
+        cnfFile << satValueWord(tableOfCorrespondances,'a',i) << " " << satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+        cnfFile << "-" << satValueWord(tableOfCorrespondances,'a',i) << " -" <<satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+      }
+
+      //Starts with an initial state
+      for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+        if(A1.isStateInitial(state->first)){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,0) << " ";
+        }
+      }
+      cnfFile << "0\n";
+
+      //Ends with a final state
+      for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+        if(A1.isStateFinal(state->first)){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,length) << " ";
+        }
+      }
+      cnfFile << "0\n";
+      //printf("C5 : %.2fs \n",(double)(clock()-c5)/CLOCKS_PER_SEC);
+
+      //clock_t c6=clock();
+      //Max one state per step
+      for(int step=0;step<=length;++step){
+        for(size_t state=0;state<A1.countStates()-1;++state){
+          for(size_t state2=state+1;state2<A1.countStates();++state2){
+            cnfFile <<"-"<< satValueAutomatons(tableOfCorrespondances,1,state,step) << " -"<<satValueAutomatons(tableOfCorrespondances,1,state2,step) << " 0\n";
+          }
+        }
+      }
+
+      //At least one state per step
+      for(int step=0;step<=length;++step){
+        for(size_t state=0;state<A1.countStates();++state){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state,step) << " ";
+        }
+        cnfFile << "0\n";
+      }
+      //printf("C6 : %.2fs \n",(double)(clock()-c6)/CLOCKS_PER_SEC);
+
+      //clock_t c7=clock();
+      //word follows A1's transitions
+      for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
+        std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
+        std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
+        for(int step=0;step<length;++step){
+          cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+          for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
+            cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+          }
+          cnfFile<<" 0\n";
+
+          cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+          for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
+            cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+          }
+          cnfFile<<" 0\n";
+        }
+      }
+      //printf("C7 : %.2fs \n",(double)(clock()-c7)/CLOCKS_PER_SEC);
+
+      /**** Rules of A2  ****/
+      //clock_t c8=clock();
+      //Starts with an initial state
+      for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
+        if(A2.isStateInitial(state->first)){
+          cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " ";
+        }
+      }
+      cnfFile << "0\n";
+      //printf("C8 : %.2fs \n",(double)(clock()-c8)/CLOCKS_PER_SEC);
+
+      //clock_t c9=clock();
+      //Accessible States
+      int count=0;
+      for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
+        std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
+        std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
+        cout << destinationsA.size() <<" "<< destinationsB.size() << "\n";
+        for(int step=0;step<length;step++){
+          for(auto to : destinationsA){
+            std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
+            std::string index2="";index2.push_back('a');index2+=" "+std::to_string(step+1); //satValuWord
+            std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
+            cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
+            cnfFile << " " << tableOfCorrespondances[index3];
+            cnfFile<<" 0\n";
+          }
+          
+          for(auto to : destinationsB){
+            std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
+            std::string index2="";index2.push_back('b');index2+=" "+std::to_string(step+1); //satValueWord
+            std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
+            cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
+            cnfFile << " " << tableOfCorrespondances[index3];
+            cnfFile<<" 0\n";
+          }
+        }
+      }
+      //printf("\nC9 : %.2fs\n",(double)(clock()-c9)/CLOCKS_PER_SEC);
+      cout << "Number of iterations " << count <<"\n"; 
+
+      //clock_t c10=clock();
+      //isNotFinalState
+      for(auto state : A2.etats){
+        if(A2.isStateFinal(state.first)){
+            cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
+        }
+      }
+      //printf("C10 : %.2fs \n",(double)(clock()-c10)/CLOCKS_PER_SEC);
     }
-
   }
-
-  //isNotFinalState
-  for(auto state : A2.etats){
-    if(A2.isStateFinal(state.first)){
-        cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
-    }
-  }
-
 }
