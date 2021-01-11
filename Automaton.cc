@@ -654,13 +654,14 @@ int satValueAutomatons(std::map<std::string,int> tableOfCorrespondances1,int aut
     index+="A2 ";
   }
   index+=std::to_string(state)+" "+std::to_string(step);
-  return tableOfCorrespondances1.at(index);
+  return tableOfCorrespondances1[index];
 }
 
 int satValueWord(std::map<std::string,int> tableOfCorrespondances1,char letter,int pos){
   std::string index="";index.push_back(letter);
   index+=" "+std::to_string(pos);
-  return tableOfCorrespondances1.at(index);
+  return tableOfCorrespondances1[index];
+  return 3;
 }
 
 void printTable(std::map<std::string,int> table){
@@ -726,95 +727,25 @@ fa::Automaton RandomAutomaton(int nbstates){
 using namespace std;
 int main(int argc, char **argv){
   srand(time(NULL));
-  /* CREER L'AUTOMATE INCLUS MANUELLEMENT*/
-  fa::Automaton A1=RandomAutomaton(8);
-  fa::Automaton A2=RandomAutomaton(13);
-  A1.dotPrint(std::cout);
-  A2.dotPrint(std::cout);
+  //Automate reconnaissant tous les mots
+      fa::Automaton A1;
+
+      A1.addSymbol('a');
+      A1.addSymbol('b');
+
+      A1.addState(0);
+
+      A1.setStateInitial(0);
+      A1.setStateFinal(0);
+
+      A1.addTransition(0,'a',0);
+      A1.addTransition(0,'b',0);
+  fa::Automaton A2=RandomAutomaton(30);
+  //A1.dotPrint(std::cout);
+ // A2.dotPrint(std::cout);
  // return 0;
-  // fa::Automaton A1;
-
-  // A1.addSymbol('a');
-  // A1.addSymbol('b');
-
-  // A1.addState(0);
-  // A1.addState(1);
-  // A1.addState(2);
-  // A1.addState(3);
-  // A1.addState(4);
-
-  // A1.setStateInitial(0);
-  // A1.setStateFinal(4);
-
-  // A1.addTransition(0,'a',1);
-  // A1.addTransition(1,'a',2);
-  // A1.addTransition(1,'b',2);
-  // A1.addTransition(2,'a',3);
-  // A1.addTransition(2,'b',3);
-  // A1.addTransition(3,'a',4);
-  // A1.addTransition(3,'b',4);
-  // A1.dotPrint(std::cout);
-
-  // fa::Automaton A2;
-
-  // A2.addSymbol('a');
-  // A2.addSymbol('b');
-
-  // A2.addState(0);
-  // A2.addState(1);
-  // A2.addState(2);
-  // A2.addState(3);
-  // A2.addState(4);
-  // A2.addState(5);
-  // A2.addState(6);
-  // A2.addState(7);
-
-  // A2.setStateInitial(0);
-  // A2.setStateFinal(4);
-
-  // A2.addTransition(0,'a',1);
-  // A2.addTransition(1,'a',2);
-  // A2.addTransition(2,'a',3);
-  // A2.addTransition(2,'b',3);
-  // A2.addTransition(3,'a',4);
-  // A2.addTransition(3,'b',4);
-  // A2.addTransition(0,'b',5);
-  // A2.addTransition(5,'a',6);
-  // A2.addTransition(5,'b',6);
-  // A2.addTransition(6,'a',7);
-  // A2.addTransition(6,'b',7);
-  // A2.addTransition(7,'a',4);
-  //A2.dotPrint(std::cout);
   
-  //fa::Automaton A2;
-  // A2.addSymbol('a');A2.addSymbol('b');
-
-  // for(int i=0;i<14;i++){
-  //   A2.addState(i);
-  // }
-  // A2.setStateFinal(8);A2.setStateInitial(0);
-  //   A2.addTransition(0,'a',1);A2.addTransition(0,'b',1);A2.addTransition(1,'a',2);
-  //   A2.addTransition(1,'b',2);A2.addTransition(2,'a',3);A2.addTransition(2,'b',9);
-  //   A2.addTransition(3,'a',4);A2.addTransition(4,'a',5);A2.addTransition(4,'b',5);
-  //   A2.addTransition(4,'a',11);A2.addTransition(5,'b',6);A2.addTransition(6,'a',7);
-  //   A2.addTransition(6,'b',7);A2.addTransition(7,'a',8);
-  //   A2.addTransition(9,'a',10);A2.addTransition(9,'b',10);A2.addTransition(10,'b',11);
-  //   A2.addTransition(11,'b',12);A2.addTransition(12,'a',13);A2.addTransition(12,'b',13);
-  //   A2.addTransition(13,'b',8);A2.addTransition(13,'a',8);
-
-  // fa::Automaton A1;
-  // A1.addSymbol('a');A1.addSymbol('b');
-  // for(int i=0;i<11;i++){
-  //   A1.addState(i);
-  // }
-  // A1.setStateFinal(8);A1.setStateInitial(0);
-  //   A1.addTransition(0,'a',1);A1.addTransition(0,'b',1);A1.addTransition(1,'a',2);
-  //   A1.addTransition(1,'b',9);A1.addTransition(2,'a',3);A1.addTransition(9,'b',10);
-  //   A1.addTransition(3,'a',4);A1.addTransition(4,'b',5);A1.addTransition(5,'b',6);
-  //   A1.addTransition(10,'a',4);A1.addTransition(6,'a',7);A1.addTransition(7,'a',8);
-
-  //   A1.addTransition(4,'a',5); //Transition à ajouter ou enlever si on veut que l'automate soit inclus 
-  int length=8;
+  int length=30;
 
   std::map<std::string,int> tableOfCorrespondances;
   //index is used to insert elements
@@ -912,6 +843,9 @@ int main(int argc, char **argv){
       }
       cnfFile<<" 0\n";
     }
+   
+
+
   }
 
   /**** Rules of A2  ****/
@@ -926,23 +860,46 @@ int main(int argc, char **argv){
 
   //Accessible States
   for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
-    std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
+   std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
     std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
-    for(int step=0;step<length;step++){
+  //   for(int step=0;step<length;step++){
+
+  //     for(auto to : destinationsA){
+  //       cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+  //       cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+  //       cnfFile<<" 0\n";
+  //      }
+      
+  //     for(auto to : destinationsB){
+  //       cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+  //       cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+  //       cnfFile<<" 0\n";
+  //     }// std::string index="";index.push_back(letter);
+  // // index+=" "+std::to_string(pos);
+  // // return tableOfCorrespondances1[index];
+      
+  //   }
+  for(int step=0;step<length;step++){
 
       for(auto to : destinationsA){
-        cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
-        cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+        std::string index="A2 ";index+=std::to_string(to)+" "+std::to_string(step); //satValueAutomatons
+        std::string index2="";index2.push_back('a');index2+=" "+std::to_string(step+1); //satValuWord
+        std::string index3="A2 ";index+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
+        cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
+        cnfFile << " " << tableOfCorrespondances[index3];
         cnfFile<<" 0\n";
        }
       
       for(auto to : destinationsB){
-        cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,2,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
-        cnfFile << " " << satValueAutomatons(tableOfCorrespondances,2,to,step+1);
+        std::string index="A2 ";index+=std::to_string(to)+" "+std::to_string(step); //satValueAutomatons
+        std::string index2="";index2.push_back('b');index2+=" "+std::to_string(step+1); //satValueWord
+        std::string index3="A2 ";index+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
+        cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
+        cnfFile << " " << tableOfCorrespondances[index3];
         cnfFile<<" 0\n";
       }
-      
     }
+
   }
 
   //isNotFinalState
