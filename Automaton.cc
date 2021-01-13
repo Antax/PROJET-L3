@@ -741,23 +741,15 @@ int main(int argc, char **argv){
         }
         cout << "A1 is not included in A2\n";
         if(!line.compare("SAT")==0){
-          for(int i=0;i<length*2;++i){
+          for(int i=0;i<length;++i){
             std::string var=split(line,' ',i);
             if (var.at(0)!='-'){
-              if(stoi(var)<=length){
-                cout<< "a";
-              }else{
-                cout<<"b";
-              }
+              cout<<"a";
+            }else{
+              cout<<"b";
             }
           }
           cout<<"\n";
-          for(int i=0;i<length*2;++i){
-            std::string var=split(line,' ',i);
-            if (var.at(0)!='-'){
-              cout<<" "<<var;
-            }
-          }
         }
       }
       cout << "\n";
