@@ -740,6 +740,7 @@ int main(int argc, char **argv){
           return 1;
         }
         cout << "A1 is not included in A2\n";
+
         if(!line.compare("SAT")==0){
           for(int i=0;i<length;++i){
             std::string var=split(line,' ',i);
@@ -749,7 +750,6 @@ int main(int argc, char **argv){
               cout<<"b";
             }
           }
-          cout<<"\n";
         }
       }
       cout << "\n";
