@@ -728,7 +728,7 @@ using namespace std;
 int main(int argc, char **argv){
   
   
-  int length=2;
+  int length=5;
   if(argc==1){
     std::map<int,int> result;
     string line;
@@ -774,45 +774,45 @@ int main(int argc, char **argv){
       fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
-      // A2.addState(0);
-      // A2.addState(1);
-      // A2.addState(2);
-      // A2.addState(3);
-      // A2.addState(4);
-      // A2.addTransition(0,'b',2);
-      // A2.addTransition(0,'a',4);
-      // A2.addTransition(1,'a',4);
-      // A2.addTransition(2,'a',0);
-      // A2.addTransition(2,'b',0);
-      // A2.addTransition(2,'a',1);
-      // A2.addTransition(2,'a',2);
-      // A2.addTransition(2,'a',3);
-      // A2.addTransition(2,'b',3);
-      // A2.addTransition(2,'b',4);
-      // A2.addTransition(3,'b',1);
-      // A2.addTransition(3,'a',4);
-      // A2.addTransition(4,'a',2);
-      // A2.addTransition(4,'a',4);
-      // A2.setStateFinal(1);
-      // A2.setStateFinal(2);
-      // A2.setStateInitial(1);
-      // A2.setStateInitial(2);
-      // A2.setStateInitial(3);
-      // A2.setStateInitial(4);
-      // A2.setStateInitial(0);
-
       A2.addState(0);
       A2.addState(1);
       A2.addState(2);
-
-      A2.addTransition(0,'a',2);
+      A2.addState(3);
+      A2.addState(4);
+      //A2.addTransition(0,'b',2); Add this transition to Include
+      A2.addTransition(0,'a',4);
+      A2.addTransition(1,'a',4);
+      A2.addTransition(2,'a',0);
+      A2.addTransition(2,'b',0);
+      A2.addTransition(2,'a',1);
       A2.addTransition(2,'a',2);
-      A2.addTransition(2,'b',2);
-      A2.addTransition(1,'a',2);
-      A2.addTransition(1,'b',2);
+      A2.addTransition(2,'a',3);
+      A2.addTransition(2,'b',3);
+      A2.addTransition(2,'b',4);
+      A2.addTransition(3,'b',1);
+      A2.addTransition(3,'a',4);
+      A2.addTransition(4,'a',2);
+      A2.addTransition(4,'b',4);
+      A2.setStateFinal(1);
       A2.setStateFinal(2);
       A2.setStateInitial(1);
+      A2.setStateInitial(2);
+      A2.setStateInitial(3);
+      A2.setStateInitial(4);
       A2.setStateInitial(0);
+
+      //A2.addState(0);
+      //A2.addState(1);
+      //A2.addState(2);
+
+      // A2.addTransition(0,'a',2);
+      // A2.addTransition(2,'a',2);
+      // A2.addTransition(2,'b',2);
+      // A2.addTransition(1,'a',2);
+      // A2.addTransition(0,'b',2);
+      // A2.setStateFinal(2);
+      // A2.setStateInitial(1);
+      // A2.setStateInitial(0);
         //A1.dotPrint(std::cout);
        //A2.dotPrint(std::cout);
       // return 0;
@@ -934,10 +934,10 @@ int main(int argc, char **argv){
         if(A2.isStateInitial(state->first)){
           // std::string index="A2 ";index+=std::to_string(state->first)+" 0";
           // cnfFile << tableOfCorrespondances[index] << " ";
-          cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " ";
+          cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " 0\n";
         }
       }
-      cnfFile << "0\n";
+     // cnfFile << "0\n";
       //printf("C8 : %.2fs \n",(double)(clock()-c8)/CLOCKS_PER_SEC);
 
       //clock_t c9=clock();

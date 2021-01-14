@@ -939,7 +939,7 @@ A2.addState(1);
 A2.addState(2);
 A2.addState(3);
 A2.addState(4);
-A2.addTransition(0,'b',2);
+//A2.addTransition(0,'b',2); Add this transition to Include
 A2.addTransition(0,'a',4);
 A2.addTransition(1,'a',4);
 A2.addTransition(2,'a',0);
