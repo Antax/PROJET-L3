@@ -26,7 +26,7 @@ then
         minisat test.cnf test.out
     done
 else
-    for i in {0..10}
+    for i in $(seq $2)
     do
         ./TestsAutomaton
     done

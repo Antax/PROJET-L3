@@ -727,7 +727,7 @@ using namespace std;
 int main(int argc, char **argv){
   
   
-  int length=100;
+  int length=40;
   if(argc==1){
     std::map<int,int> result;
     string line;
@@ -770,7 +770,7 @@ int main(int argc, char **argv){
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
       
-      fa::Automaton A2=RandomAutomaton(50);
+      fa::Automaton A2=RandomAutomaton(30);
       /*fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
