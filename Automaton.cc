@@ -661,7 +661,6 @@ int satValueWord(std::map<std::string,int> tableOfCorrespondances1,char letter,i
   std::string index="";index.push_back(letter);
   index+=" "+std::to_string(pos);
   return tableOfCorrespondances1[index];
-  return 3;
 }
 
 void printTable(std::map<std::string,int> table){
@@ -728,7 +727,7 @@ using namespace std;
 int main(int argc, char **argv){
   
   
-  int length=5;
+  int length=100;
   if(argc==1){
     std::map<int,int> result;
     string line;
@@ -770,8 +769,9 @@ int main(int argc, char **argv){
 
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
-        //fa::Automaton A2=RandomAutomaton(30);
-      fa::Automaton A2;
+      
+      fa::Automaton A2=RandomAutomaton(50);
+      /*fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
       A2.addState(0);
@@ -799,7 +799,7 @@ int main(int argc, char **argv){
       A2.setStateInitial(2);
       A2.setStateInitial(3);
       A2.setStateInitial(4);
-      A2.setStateInitial(0);
+      A2.setStateInitial(0);*/
 
       //A2.addState(0);
       //A2.addState(1);
@@ -816,8 +816,6 @@ int main(int argc, char **argv){
         //A1.dotPrint(std::cout);
        //A2.dotPrint(std::cout);
       // return 0;
-    if(strcmp(argv[1],"--sat")==0){
-
       std::map<std::string,int> tableOfCorrespondances;
       //index is used to insert elements
       int tableIndex=1;
@@ -855,9 +853,8 @@ int main(int argc, char **argv){
           tableIndex++;
         }
       }
-      //printf("C4 : %.2fs \n",(double)(clock()-c4)/CLOCKS_PER_SEC);
 
-      printTable(tableOfCorrespondances);
+      //printf("C4 : %.2fs \n",(double)(clock()-c4)/CLOCKS_PER_SEC);
 
       ofstream cnfFile;
       cnfFile.open("test.cnf");
@@ -866,14 +863,17 @@ int main(int argc, char **argv){
       //clock_t c5=clock();
       //at each place in the word, only a or only or b
       for(int i=1;i<=length;++i){
-        cnfFile << satValueWord(tableOfCorrespondances,'a',i) << " " << satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
-        cnfFile << "-" << satValueWord(tableOfCorrespondances,'a',i) << " -" <<satValueWord(tableOfCorrespondances,'b',i) << " 0\n";
+        std::string index1 ="a "+std::to_string(i);
+        std::string index2 ="b "+std::to_string(i);
+        cnfFile << tableOfCorrespondances[index1] << " " << tableOfCorrespondances[index2] << " 0\n";
+        cnfFile << "-" << tableOfCorrespondances[index1] << " -" <<tableOfCorrespondances[index2] << " 0\n";
       }
 
       //Starts with an initial state
       for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
         if(A1.isStateInitial(state->first)){
-          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,0) << " ";
+          std::string index1="A1 "+std::to_string(state->first)+" "+"0";
+          cnfFile << tableOfCorrespondances[index1] << " ";
         }
       }
       cnfFile << "0\n";
@@ -881,7 +881,8 @@ int main(int argc, char **argv){
       //Ends with a final state
       for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
         if(A1.isStateFinal(state->first)){
-          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state->first,length) << " ";
+          std::string index1="A1 "+std::to_string(state->first)+" "+std::to_string(length);
+          cnfFile << tableOfCorrespondances[index1] << " ";
         }
       }
       cnfFile << "0\n";
@@ -892,7 +893,9 @@ int main(int argc, char **argv){
       for(int step=0;step<=length;++step){
         for(size_t state=0;state<A1.countStates()-1;++state){
           for(size_t state2=state+1;state2<A1.countStates();++state2){
-            cnfFile <<"-"<< satValueAutomatons(tableOfCorrespondances,1,state,step) << " -"<<satValueAutomatons(tableOfCorrespondances,1,state2,step) << " 0\n";
+            std::string index1="A1 "+std::to_string(state)+" "+std::to_string(step);
+            std::string index2="A1 "+std::to_string(state2)+" "+std::to_string(step);
+            cnfFile <<"-"<< tableOfCorrespondances[index1] << " -"<<tableOfCorrespondances[index2]<< " 0\n";
           }
         }
       }
@@ -900,7 +903,8 @@ int main(int argc, char **argv){
       //At least one state per step
       for(int step=0;step<=length;++step){
         for(size_t state=0;state<A1.countStates();++state){
-          cnfFile << satValueAutomatons(tableOfCorrespondances,1,state,step) << " ";
+          std::string index1="A1 "+std::to_string(state)+" "+std::to_string(step);
+          cnfFile << tableOfCorrespondances[index1] << " ";
         }
         cnfFile << "0\n";
       }
@@ -912,15 +916,19 @@ int main(int argc, char **argv){
         std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
         std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
         for(int step=0;step<length;++step){
-          cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'a',step+1);
+          std::string index1="A1 "+std::to_string(state->first)+" "+std::to_string(step);
+          std::string index2 ="a "+std::to_string(step+1);
+          cnfFile << "-" <<tableOfCorrespondances[index1]<<" -"<<tableOfCorrespondances[index2];
           for(std::set<int>::const_iterator to=destinationsA.begin();to!=destinationsA.end();to++){
-            cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+            std::string index3="A1 "+std::to_string(*to)+" "+std::to_string(step+1);
+            cnfFile << " "<<tableOfCorrespondances[index3];
           }
           cnfFile<<" 0\n";
-
-          cnfFile << "-" <<satValueAutomatons(tableOfCorrespondances,1,state->first,step)<<" -"<<satValueWord(tableOfCorrespondances,'b',step+1);
+          std::string index4 ="b "+std::to_string(step+1);
+          cnfFile << "-" <<tableOfCorrespondances[index1]<<" -"<<tableOfCorrespondances[index4];
           for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
-            cnfFile << " "<<satValueAutomatons(tableOfCorrespondances,1,*to,step+1);
+            std::string index3="A1 "+std::to_string(*to)+" "+std::to_string(step+1);
+            cnfFile << " "<<tableOfCorrespondances[index3];
           }
           cnfFile<<" 0\n";
         }
@@ -934,7 +942,8 @@ int main(int argc, char **argv){
         if(A2.isStateInitial(state->first)){
           // std::string index="A2 ";index+=std::to_string(state->first)+" 0";
           // cnfFile << tableOfCorrespondances[index] << " ";
-          cnfFile << satValueAutomatons(tableOfCorrespondances,2,state->first,0) << " 0\n";
+          std::string index="A2 "+std::to_string(state->first)+" 0";
+          cnfFile << tableOfCorrespondances[index] << " 0\n";
         }
       }
      // cnfFile << "0\n";
@@ -942,11 +951,9 @@ int main(int argc, char **argv){
 
       //clock_t c9=clock();
       //Accessible States
-      int count=0;
       for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
         std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
         std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
-        cout << destinationsA.size() <<" "<< destinationsB.size() << "\n";
         for(int step=0;step<length;step++){
           for(auto to : destinationsA){
             std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
@@ -968,16 +975,15 @@ int main(int argc, char **argv){
         }
       }
       //printf("\nC9 : %.2fs\n",(double)(clock()-c9)/CLOCKS_PER_SEC);
-      cout << "Number of iterations " << count <<"\n"; 
 
       //clock_t c10=clock();
       //isNotFinalState
       for(auto state : A2.etats){
         if(A2.isStateFinal(state.first)){
-            cnfFile <<" -"<<satValueAutomatons(tableOfCorrespondances,2,state.first,length) << " 0\n";      
+          std::string index= "A1 "+std::to_string(state.first)+" "+std::to_string(length);
+          cnfFile <<" -"<<tableOfCorrespondances[index] << " 0\n";      
         }
       }
       //printf("C10 : %.2fs \n",(double)(clock()-c10)/CLOCKS_PER_SEC);
-    }
   }
 }
