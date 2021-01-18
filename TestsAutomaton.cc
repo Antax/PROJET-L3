@@ -870,18 +870,18 @@ namespace fa {
 using namespace std;
 fa::Automaton RandomAutomaton(int nbstates){
 
-  ofstream fich("./CreateAutomaton.txt");
+//  ofstream fich("./CreateAutomaton.txt");
   fa::Automaton res;
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
   for(char c : letter){
     res.addSymbol(c);
-    fich << "res.addSymbol('"<<c<<"');"<<"\n";
+  //  fich << "res.addSymbol('"<<c<<"');"<<"\n";
   }
   for(int i=0;i<nbstates;++i){
     res.addState(i);
-    fich << "res.addState("<<i<<");"<<"\n";
+   // fich << "res.addState("<<i<<");"<<"\n";
   }
   for(auto s : res.states){
     for(auto ss : res.states){
@@ -890,7 +890,7 @@ fa::Automaton RandomAutomaton(int nbstates){
         
         if(rand1 < 1.6/nbstates){
           res.addTransition(s.nb,c,ss.nb);
-          fich << "res.addTransition("<<s.nb<<",'"<<c<<"',"<<ss.nb<<");"<<"\n";
+          //fich << "res.addTransition("<<s.nb<<",'"<<c<<"',"<<ss.nb<<");"<<"\n";
         }
       }
     }
@@ -900,18 +900,18 @@ fa::Automaton RandomAutomaton(int nbstates){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.5){
       res.setStateFinal(i);
-      fich << "res.setStateFinal("<<i<<");"<<"\n";
+    //  fich << "res.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.5){
       res.setStateInitial(i);
-      fich << "res.setStateInitial("<<i<<");"<<"\n";
+     // fich << "res.setStateInitial("<<i<<");"<<"\n";
     }
   }
   res.setStateInitial(0);
-  fich<<"res.setStateInitial(0);"<<"\n";
+  //fich<<"res.setStateInitial(0);"<<"\n";
 
   return res;
 }
@@ -930,7 +930,8 @@ int main(int argc, char **argv){
 
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
-  fa::Automaton A2=RandomAutomaton(30);
+      srand(time(NULL));
+  fa::Automaton A2=RandomAutomaton(5);
 //  fa::Automaton A2;
 //  A2.addSymbol('a');
 // A2.addSymbol('b');
@@ -960,7 +961,7 @@ int main(int argc, char **argv){
 // A2.setStateInitial(3);
 // A2.setStateInitial(4);
 // A2.setStateInitial(0);
-  A2.dotPrint(std::cout);
+  //A2.dotPrint(std::cout);
     if(A1.isIncludedIn(A2)){
         printf("Automaton A1 is Include in A2 : True \n");
     }else{
