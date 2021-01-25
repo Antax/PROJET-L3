@@ -725,9 +725,11 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 using namespace std;
 int main(int argc, char **argv){
-  
-  
   int length=40;
+  if(argc==3){
+    length=stoi(argv[2]);
+  }
+  
   if(argc==1){
     std::map<int,int> result;
     string line;
