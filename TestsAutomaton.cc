@@ -916,6 +916,30 @@ fa::Automaton RandomAutomaton(int nbstates){
   return res;
 }
 
+
+// bool IncludedWithLength(const fa::Automaton& A,const fa::Automaton& other,int length) {
+//   assert(other.isValid());
+
+//   if(!A.isValid()){
+//     if(A.isLanguageEmpty()){
+//       return true;
+//     }
+//   }
+//   fa::Automaton copy=other;
+//     for(char symb : A.alphabet){
+//     if(!other.hasSymbol(symb)){
+//       copy.addSymbol(symb);
+//     }
+//   }
+//   copy=copy.createComplement(copy);
+
+//   fa::Automaton product=A.createProduct(A,copy);
+//   return true; 
+  
+// }
+
+
+
 int main(int argc, char **argv){
 
    fa::Automaton A1;
@@ -931,7 +955,7 @@ int main(int argc, char **argv){
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
       srand(time(NULL));
-  fa::Automaton A2=RandomAutomaton(5);
+  fa::Automaton A2=RandomAutomaton(50);
 //  fa::Automaton A2;
 //  A2.addSymbol('a');
 // A2.addSymbol('b');

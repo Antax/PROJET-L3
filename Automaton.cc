@@ -772,7 +772,7 @@ int main(int argc, char **argv){
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
       
-      fa::Automaton A2=RandomAutomaton(40);
+      fa::Automaton A2=RandomAutomaton(30);
       /*fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
@@ -781,9 +781,9 @@ int main(int argc, char **argv){
       A2.addState(2);
       A2.addState(3);
       A2.addState(4);
-      //A2.addTransition(0,'b',2); Add this transition to Include
+      A2.addTransition(0,'b',2);// Add this transition to Include
       A2.addTransition(0,'a',4);
-      A2.addTransition(1,'a',4);
+       A2.addTransition(1,'a',4);
       A2.addTransition(2,'a',0);
       A2.addTransition(2,'b',0);
       A2.addTransition(2,'a',1);
@@ -982,7 +982,7 @@ int main(int argc, char **argv){
       //isNotFinalState
       for(auto state : A2.etats){
         if(A2.isStateFinal(state.first)){
-          std::string index= "A1 "+std::to_string(state.first)+" "+std::to_string(length);
+          std::string index= "A2 "+std::to_string(state.first)+" "+std::to_string(length);
           cnfFile <<" -"<<tableOfCorrespondances[index] << " 0\n";      
         }
       }

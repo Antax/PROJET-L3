@@ -64,7 +64,7 @@ namespace fa {
     }
     
 };
-
+public:
     struct State
   {
     int nb;
