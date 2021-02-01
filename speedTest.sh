@@ -33,13 +33,17 @@ then
     do
         for j in $(seq $3)
         do
-            ./Automaton --SAT $3
+            ./Automaton --SAT $j
             minisat test.cnf test.out &>/dev/null
             line=$(head -n 1 test.out)
             if [ "SAT" == $line ]
             then
             echo $j
                 break
+            fi
+            if [ $j == $3 ]
+            then
+            echo 'Automate is Include'
             fi
         done
     done

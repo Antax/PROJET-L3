@@ -703,14 +703,14 @@ fa::Automaton RandomAutomaton(int nbstates){
 
   for(int i=0;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.5){
+    if(rand1 < 0.3){
       res.setStateFinal(i);
       fich << "res.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.5){
+    if(rand1 < 0.3){
       res.setStateInitial(i);
       fich << "res.setStateInitial("<<i<<");"<<"\n";
     }
@@ -763,16 +763,25 @@ int main(int argc, char **argv){
 
       A1.addSymbol('a');
       A1.addSymbol('b');
-
-      A1.addState(0);
+   A1.addState(0);
 
       A1.setStateInitial(0);
       A1.setStateFinal(0);
 
       A1.addTransition(0,'a',0);
       A1.addTransition(0,'b',0);
+      // A1.addState(0);A1.addState(1);
+      // A1.addState(2);A1.addState(3);
+
+      // A1.setStateInitial(0);
+      // A1.setStateFinal(3);A1.setStateFinal(2);
+
+      // A1.addTransition(0,'a',1);A1.addTransition(1,'a',2);
+      // A1.addTransition(2,'a',1);A1.addTransition(1,'a',3);
+      // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);
+      // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
       
-      fa::Automaton A2=RandomAutomaton(50);
+      fa::Automaton A2=RandomAutomaton(40);
       /*fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
