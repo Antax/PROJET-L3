@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Possiblité : 
+# ./speedTest.sh  --SAT nbExec maxLength (rand || nb)
+# ./speedTest.sh --DET nbExec (rand || nb)
+# nb : for srand
+
+
 if [ $# -ne 2 ] && [ $# -ne 3 ] && [ $# -ne 4 ]
 then
     echo "Usage : ./speedTest.sh (--SAT/--DET) numberOfExecutions maxLength (NB/rand)"
