@@ -726,7 +726,7 @@ fa::Automaton RandomAutomaton(int nbstates){
 using namespace std;
 int main(int argc, char **argv){
   int length=40;
-  if(argc==3){
+  if(argc>2){
     length=stoi(argv[2]);
   }
   
@@ -757,7 +757,12 @@ int main(int argc, char **argv){
       outFile.close();
     }
   }else{
+    if(argc==4){
+      srand(atoi(argv[3]));
+    }else{
       srand(time(NULL));
+    }
+      
   //Automate reconnaissant tous les mots
       fa::Automaton A1;
 

@@ -964,7 +964,11 @@ int main(int argc, char **argv){
       // A1.addTransition(2,'a',1);A1.addTransition(1,'a',3);
       // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);A1.addTransition(1,'b',3);
       // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
+      if(argc==2){
+      srand(atoi(argv[1]));
+    }else{
       srand(time(NULL));
+    }
   fa::Automaton A2=RandomAutomaton(40);
 //  fa::Automaton A2;
 //  A2.addSymbol('a');
