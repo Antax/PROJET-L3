@@ -674,18 +674,18 @@ Création d'automate random
 using namespace std;
 fa::Automaton RandomAutomaton(int nbstates){
 
-  ofstream fich("./CreateAutomaton.txt");
+ // ofstream fich("./CreateAutomaton.txt");
   fa::Automaton res;
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
   for(char c : letter){
     res.addSymbol(c);
-    fich << "res.addSymbol('"<<c<<"');"<<"\n";
+    //fich << "A2.addSymbol('"<<c<<"');"<<"\n";
   }
   for(int i=0;i<nbstates;++i){
     res.addState(i);
-    fich << "res.addState("<<i<<");"<<"\n";
+    //fich << "A2.addState("<<i<<");"<<"\n";
   }
   for(auto s : res.etats){
     for(auto ss : res.etats){
@@ -695,7 +695,7 @@ fa::Automaton RandomAutomaton(int nbstates){
         if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
-          fich << "res.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
+          //fich << "A2.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
         }
       }
     }
@@ -705,18 +705,18 @@ fa::Automaton RandomAutomaton(int nbstates){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.3){
       res.setStateFinal(i);
-      fich << "res.setStateFinal("<<i<<");"<<"\n";
+     // fich << "A2.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.3){
       res.setStateInitial(i);
-      fich << "res.setStateInitial("<<i<<");"<<"\n";
+    //  fich << "A2.setStateInitial("<<i<<");"<<"\n";
     }
   }
   res.setStateInitial(0);
-  fich<<"res.setStateInitial(0);"<<"\n";
+ // fich<<"A2.setStateInitial(0);"<<"\n";
 
   return res;
 }
@@ -786,7 +786,7 @@ int main(int argc, char **argv){
       // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);
       // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
       
-      fa::Automaton A2=RandomAutomaton(40);
+      fa::Automaton A2=RandomAutomaton(50);
       /*fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
