@@ -757,6 +757,8 @@ int main(int argc, char **argv){
       outFile.close();
     }
   }else{
+    srand(25);
+    fa::Automaton A1=RandomAutomaton(20);
     if(argc==4){
       srand(atoi(argv[3]));
     }else{
@@ -764,17 +766,17 @@ int main(int argc, char **argv){
     }
       
   //Automate reconnaissant tous les mots
-      fa::Automaton A1;
+  //     fa::Automaton A1;
 
-      A1.addSymbol('a');
-      A1.addSymbol('b');
-   A1.addState(0);
+  //     A1.addSymbol('a');
+  //     A1.addSymbol('b');
+  //  A1.addState(0);
 
-      A1.setStateInitial(0);
-      A1.setStateFinal(0);
+  //     A1.setStateInitial(0);
+  //     A1.setStateFinal(0);
 
-      A1.addTransition(0,'a',0);
-      A1.addTransition(0,'b',0);
+  //     A1.addTransition(0,'a',0);
+  //     A1.addTransition(0,'b',0);
       // A1.addState(0);A1.addState(1);
       // A1.addState(2);A1.addState(3);
 
@@ -786,7 +788,7 @@ int main(int argc, char **argv){
       // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);
       // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
       
-      fa::Automaton A2=RandomAutomaton(50);
+      fa::Automaton A2=RandomAutomaton(40);
       /*fa::Automaton A2;
       A2.addSymbol('a');
       A2.addSymbol('b');
