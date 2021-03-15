@@ -674,18 +674,18 @@ Création d'automate random
 using namespace std;
 fa::Automaton RandomAutomaton(int nbstates){
 
- // ofstream fich("./CreateAutomaton.txt");
+  ofstream fich("./CreateAutomaton2.txt");
   fa::Automaton res;
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
   for(char c : letter){
     res.addSymbol(c);
-    //fich << "A2.addSymbol('"<<c<<"');"<<"\n";
+    fich << "A2.addSymbol('"<<c<<"');"<<"\n";
   }
   for(int i=0;i<nbstates;++i){
     res.addState(i);
-    //fich << "A2.addState("<<i<<");"<<"\n";
+    fich << "A2.addState("<<i<<");"<<"\n";
   }
   for(auto s : res.etats){
     for(auto ss : res.etats){
@@ -695,7 +695,7 @@ fa::Automaton RandomAutomaton(int nbstates){
         if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
-          //fich << "A2.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
+          fich << "A2.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
         }
       }
     }
@@ -705,18 +705,18 @@ fa::Automaton RandomAutomaton(int nbstates){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.3){
       res.setStateFinal(i);
-     // fich << "A2.setStateFinal("<<i<<");"<<"\n";
+      fich << "A2.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.3){
       res.setStateInitial(i);
-    //  fich << "A2.setStateInitial("<<i<<");"<<"\n";
+      fich << "A2.setStateInitial("<<i<<");"<<"\n";
     }
   }
   res.setStateInitial(0);
- // fich<<"A2.setStateInitial(0);"<<"\n";
+  fich<<"A2.setStateInitial(0);"<<"\n";
 
   return res;
 }
@@ -758,7 +758,7 @@ int main(int argc, char **argv){
     }
   }else{
     srand(25);
-    fa::Automaton A1=RandomAutomaton(20);
+    fa::Automaton A1=RandomAutomaton(40);
     if(argc==4){
       srand(atoi(argv[3]));
     }else{
@@ -766,17 +766,17 @@ int main(int argc, char **argv){
     }
       
   //Automate reconnaissant tous les mots
-  //     fa::Automaton A1;
+      // fa::Automaton A1;
 
-  //     A1.addSymbol('a');
-  //     A1.addSymbol('b');
-  //  A1.addState(0);
+      // A1.addSymbol('a');
+      // A1.addSymbol('b');
+      // A1.addState(0);
 
-  //     A1.setStateInitial(0);
-  //     A1.setStateFinal(0);
+      // A1.setStateInitial(0);
+      // A1.setStateFinal(0);
 
-  //     A1.addTransition(0,'a',0);
-  //     A1.addTransition(0,'b',0);
+      //  A1.addTransition(0,'a',0);
+      //  A1.addTransition(0,'b',0);
       // A1.addState(0);A1.addState(1);
       // A1.addState(2);A1.addState(3);
 

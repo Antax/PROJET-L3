@@ -758,7 +758,16 @@ namespace fa {
         }
         return true;
       }
+      std::cout<<"Product\n";
+      double time=0.0;
+      std::clock_t start;
+      start=std::clock();
+
+      
        Automaton product=createProduct(*this,other);
+       time=(std::clock()-start)/(double) CLOCKS_PER_SEC;
+      std::cout<<"temps de l'intersection : "<<time<<std::endl;
+      std::cout<<"Product DONE\n";
       if(!product.isValid()){ //Never go inside
         return true;
       }
@@ -862,7 +871,15 @@ namespace fa {
           copy.addSymbol(symb);
         }
       }
+      std::cout<<"Création du complément\n";
+      double time=0.0;
+      std::clock_t start;
+      start=std::clock(); 
       Automaton complement=createComplement(copy);
+      time=(std::clock()-start)/(double) CLOCKS_PER_SEC;
+      std::cout<<"temps pour la déterminisation: "<<time<<std::endl;
+      std::cout<<"Création du complément DONE\n";
+      //Automaton cccc=createDeterministic(*this);
       return hasEmptyIntersectionWith(complement);
     }
 
@@ -918,45 +935,22 @@ fa::Automaton RandomAutomaton(int nbstates){
 }
 
 
-// bool IncludedWithLength(const fa::Automaton& A,const fa::Automaton& other,int length) {
-//   assert(other.isValid());
-
-//   if(!A.isValid()){
-//     if(A.isLanguageEmpty()){
-//       return true;
-//     }
-//   }
-//   fa::Automaton copy=other;
-//     for(char symb : A.alphabet){
-//     if(!other.hasSymbol(symb)){
-//       copy.addSymbol(symb);
-//     }
-//   }
-//   copy=copy.createComplement(copy);
-
-//   fa::Automaton product=A.createProduct(A,copy);
-//   return true; 
-  
-// }
-
-
 
 int main(int argc, char **argv){
   srand(25);
-    fa::Automaton A1=RandomAutomaton(20);
+     fa::Automaton A1=RandomAutomaton(20);
 
-  //  fa::Automaton A1;
+      //fa::Automaton A1;
+      // A1.addSymbol('a');
+      // A1.addSymbol('b');
 
-  //     A1.addSymbol('a');
-  //     A1.addSymbol('b');
+      // A1.addState(0);
 
-  //     A1.addState(0);
+      // A1.setStateInitial(0);
+      // A1.setStateFinal(0);
 
-  //     A1.setStateInitial(0);
-  //     A1.setStateFinal(0);
-
-  //     A1.addTransition(0,'a',0);
-  //     A1.addTransition(0,'b',0);
+      // A1.addTransition(0,'a',0);
+      // A1.addTransition(0,'b',0);
       // A1.addState(0);A1.addState(1);
       // A1.addState(2);A1.addState(3);
 
@@ -972,7 +966,7 @@ int main(int argc, char **argv){
     }else{
       srand(time(NULL));
     }
-  fa::Automaton A2=RandomAutomaton(40);
+  fa::Automaton A2=RandomAutomaton(25);
 //  fa::Automaton A2;
 //  A2.addSymbol('a');
 // A2.addSymbol('b');
