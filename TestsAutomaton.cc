@@ -879,7 +879,7 @@ namespace fa {
       time=(std::clock()-start)/(double) CLOCKS_PER_SEC;
       std::cout<<"temps pour la déterminisation: "<<time<<std::endl;
       std::cout<<"Création du complément DONE\n";
-      //Automaton cccc=createDeterministic(*this);
+      //Automaton deter=createDeterministic(*this);
       return hasEmptyIntersectionWith(complement);
     }
 
@@ -906,7 +906,7 @@ fa::Automaton RandomAutomaton(int nbstates){
       for(char c : letter){
         double rand1 = rand() / (double)RAND_MAX;
 
-        if(rand1 < 2.5/(nbstates/10)){
+        if(rand1 < 1.6/(nbstates)){
           res.addTransition(s.nb,c,ss.nb);
           //fich << "A2.addTransition("<<s.nb<<",'"<<c<<"',"<<ss.nb<<");"<<"\n";
         }
@@ -916,14 +916,14 @@ fa::Automaton RandomAutomaton(int nbstates){
 
   for(int i=0;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.6){
+    if(rand1 < 0.3){
       res.setStateFinal(i);
     //  fich << "A2.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.6){
+    if(rand1 < 0.3){
       res.setStateInitial(i);
      // fich << "A2.setStateInitial("<<i<<");"<<"\n";
     }
@@ -938,24 +938,24 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 int main(int argc, char **argv){
   srand(25);
-     fa::Automaton A1=RandomAutomaton(10);
+    // fa::Automaton A1=RandomAutomaton(10);
 
-      //fa::Automaton A1;
-      // A1.addSymbol('a');
-      // A1.addSymbol('b');
+      fa::Automaton A1;
+      A1.addSymbol('a');
+      A1.addSymbol('b');
 
-      // A1.addState(0);
+      A1.addState(0);
 
-      // A1.setStateInitial(0);
-      // A1.setStateFinal(0);
+      A1.setStateInitial(0);
+      A1.setStateFinal(0);
 
-      // A1.addTransition(0,'a',0);
-      // A1.addTransition(0,'b',0);
-      // A1.addState(0);A1.addState(1);
-      // A1.addState(2);A1.addState(3);
+      A1.addTransition(0,'a',0);
+      A1.addTransition(0,'b',0);
+      A1.addState(0);A1.addState(1);
+      A1.addState(2);A1.addState(3);
 
-      // A1.setStateInitial(0);
-      // A1.setStateFinal(3);A1.setStateFinal(2);
+      A1.setStateInitial(0);
+      A1.setStateFinal(3);A1.setStateFinal(2);
 
       // A1.addTransition(0,'a',1);A1.addTransition(1,'a',2);
       // A1.addTransition(2,'a',1);A1.addTransition(1,'a',3);
@@ -972,35 +972,6 @@ int main(int argc, char **argv){
     }
     //printf("nb : %d\n",nbStates);
   fa::Automaton A2=RandomAutomaton(nbStates);
-//  fa::Automaton A2;
-//  A2.addSymbol('a');
-// A2.addSymbol('b');
-// A2.addState(0);
-// A2.addState(1);
-// A2.addState(2);
-// A2.addState(3);
-// A2.addState(4);
-// //A2.addTransition(0,'b',2); Add this transition to Include
-// A2.addTransition(0,'a',4);
-// A2.addTransition(1,'a',4);
-// A2.addTransition(2,'a',0);
-// A2.addTransition(2,'b',0);
-// A2.addTransition(2,'a',1);
-// A2.addTransition(2,'a',2);
-// A2.addTransition(2,'a',3);
-// A2.addTransition(2,'b',3);
-// A2.addTransition(2,'b',4);
-// A2.addTransition(3,'b',1);
-// A2.addTransition(3,'a',4);
-// A2.addTransition(4,'a',2);
-// A2.addTransition(4,'a',4);
-// A2.setStateFinal(1);
-// A2.setStateFinal(2);
-// A2.setStateInitial(1);
-// A2.setStateInitial(2);
-// A2.setStateInitial(3);
-// A2.setStateInitial(4);
-// A2.setStateInitial(0);
   //A2.dotPrint(std::cout);
     if(A1.isIncludedIn(A2)){
         printf("Automaton A1 is Include in A2 : True \n");
