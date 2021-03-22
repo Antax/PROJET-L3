@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # fake makefile
 # chmod +x make.sh
 # ./make.sh
