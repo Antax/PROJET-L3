@@ -906,7 +906,7 @@ fa::Automaton RandomAutomaton(int nbstates){
       for(char c : letter){
         double rand1 = rand() / (double)RAND_MAX;
 
-        if(rand1 < 1.6/nbstates){
+        if(rand1 < 2.5/(nbstates/10)){
           res.addTransition(s.nb,c,ss.nb);
           //fich << "A2.addTransition("<<s.nb<<",'"<<c<<"',"<<ss.nb<<");"<<"\n";
         }
@@ -916,14 +916,14 @@ fa::Automaton RandomAutomaton(int nbstates){
 
   for(int i=0;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.5){
+    if(rand1 < 0.6){
       res.setStateFinal(i);
     //  fich << "A2.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.5){
+    if(rand1 < 0.6){
       res.setStateInitial(i);
      // fich << "A2.setStateInitial("<<i<<");"<<"\n";
     }
