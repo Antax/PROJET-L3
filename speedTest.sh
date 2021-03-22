@@ -1,32 +1,41 @@
 #!/bin/bash
 
 #Possiblité : 
-# ./speedTest.sh  --SAT nbExec maxLength (rand || nb)
-# ./speedTest.sh --DET nbExec (rand || nb)
+# ./speedTest.sh  --SAT nbExec nbStates maxLength (rand || nb)
+# ./speedTest.sh --DET nbExec nbStates (rand || nb)
 # nb : for srand
 
 
-if [ $# -ne 2 ] && [ $# -ne 3 ] && [ $# -ne 4 ]
+if [ $# -ne 3 ] && [ $# -ne 4 ] && [ $# -ne 5 ]
 then
-    echo "Usage : ./speedTest.sh (--SAT/--DET) numberOfExecutions maxLength (NB/rand)"
+    echo "Usage : ./speedTest.sh (--SAT/--DET) numberOfExecutions numberOfStates (maxLength (NB/rand))"
     exit 1
 fi
 
 if [ "--SAT" != $1 ] && [ "--DET" != $1 ]
 then
-    echo "Usage : ./speedTest.sh (--SAT/--DET) numberOfExecutions maxLength (NB/rand)"
+    echo "Usage : ./speedTest.sh (--SAT/--DET) numberOfExecutions numberOfStates (maxLength (NB/rand))"
     exit 1
 fi
 
+#number of executions >0
 if [ 0 -ge $2 ]
 then
     echo "number of executions must be strictely positive"
     exit 1
 fi
 
+#number of states >0
+if [ 0 -ge $3 ]
+then
+    echo "number of states must be strictely positive"
+    exit 1
+fi
+
 if [ "--SAT" == $1 ] 
 then
-    if [ $# -eq 2 ] || [ 0 -ge $3 ]
+    #max length >0
+    if [ $# -le 3 ] || [ 0 -ge $4 ]
     then
         echo "max length must be strictely positive"
         exit 1
@@ -35,19 +44,19 @@ fi
 
 if [ "--SAT" = $1 ]
 then 
-    for i in $(seq $2)
+    for i in $(seq $2) #number of executions -> to the random seed
     do
-        for j in $(seq $3)
+        for j in $(seq $4) #max length
         do
-            if [ $# -ne 4 ]
+            if [ $# -ne 5 ]
             then
-                ./Automaton --SAT $j $i
+                ./Automaton --SAT $j $3 $i
             else
-                if [ $4 == "rand" ]
+                if [ $5 == "rand" ]
                 then
-                    ./Automaton --SAT $j
+                    ./Automaton --SAT $j $3
                 else
-                    ./Automaton --SAT $j $[$i+$4]
+                    ./Automaton --SAT $j $3 $[$i+$5]
                 fi
             fi
             minisat test.cnf test.out &>/dev/null
@@ -57,24 +66,24 @@ then
             echo $j
                 break
             fi
-            if [ $j == $3 ]
+            if [ $j == $4 ] #if maxlength has been tested
             then
             echo 'Automate is Include'
             fi
         done
     done
-else
-    for i in $(seq $2)
+else #--DET
+    for i in $(seq $2) #number of exectutions -> to the random seed
     do
-        if [ $# -ne 3 ]
+        if [ $# -ne 4 ]
         then
-            ./TestsAutomaton $i
+            ./TestsAutomaton $3 $i
         else
             if [ $3 == "rand" ]
             then
-                ./TestsAutomaton
+                ./TestsAutomaton $3 
             else
-                ./TestsAutomaton $[$i+$3]
+                ./TestsAutomaton $3 $[$i+$4]
             fi
         fi
     done

@@ -729,6 +729,7 @@ int main(int argc, char **argv){
   if(argc>2){
     length=stoi(argv[2]);
   }
+  //printf("length : %d\n",length);
   
   if(argc==1){
     std::map<int,int> result;
@@ -737,30 +738,35 @@ int main(int argc, char **argv){
     if (outFile.is_open()){
       while(getline(outFile,line)){
         if(line.compare("UNSAT")==0){
-          cout << "A1 is included in A2\n";
+          std::cout << "A1 is included in A2\n";
           return 1;
         }
-        cout << "A1 is not included in A2\n";
+        std::cout << "A1 is not included in A2\n";
 
         if(!line.compare("SAT")==0){
           for(int i=0;i<length;++i){
             std::string var=split(line,' ',i);
             if (var.at(0)!='-'){
-              cout<<"a";
+              std::cout<<"a";
             }else{
-              cout<<"b";
+              std::cout<<"b";
             }
           }
         }
       }
-      cout << "\n";
+      std::cout << "\n";
       outFile.close();
     }
   }else{
+    int nbStates=10;
+    if(argc>3){
+      nbStates=stoi(argv[3]);
+    }
+    //printf("nb : %d\n",nbStates);
     srand(25);
-    fa::Automaton A1=RandomAutomaton(40);
-    if(argc==4){
-      srand(atoi(argv[3]));
+    fa::Automaton A1=RandomAutomaton(10);
+    if(argc==5){
+      srand(atoi(argv[4]));
     }else{
       srand(time(NULL));
     }
@@ -788,49 +794,7 @@ int main(int argc, char **argv){
       // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);
       // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
       
-      fa::Automaton A2=RandomAutomaton(40);
-      /*fa::Automaton A2;
-      A2.addSymbol('a');
-      A2.addSymbol('b');
-      A2.addState(0);
-      A2.addState(1);
-      A2.addState(2);
-      A2.addState(3);
-      A2.addState(4);
-      A2.addTransition(0,'b',2);// Add this transition to Include
-      A2.addTransition(0,'a',4);
-       A2.addTransition(1,'a',4);
-      A2.addTransition(2,'a',0);
-      A2.addTransition(2,'b',0);
-      A2.addTransition(2,'a',1);
-      A2.addTransition(2,'a',2);
-      A2.addTransition(2,'a',3);
-      A2.addTransition(2,'b',3);
-      A2.addTransition(2,'b',4);
-      A2.addTransition(3,'b',1);
-      A2.addTransition(3,'a',4);
-      A2.addTransition(4,'a',2);
-      A2.addTransition(4,'b',4);
-      A2.setStateFinal(1);
-      A2.setStateFinal(2);
-      A2.setStateInitial(1);
-      A2.setStateInitial(2);
-      A2.setStateInitial(3);
-      A2.setStateInitial(4);
-      A2.setStateInitial(0);*/
-
-      //A2.addState(0);
-      //A2.addState(1);
-      //A2.addState(2);
-
-      // A2.addTransition(0,'a',2);
-      // A2.addTransition(2,'a',2);
-      // A2.addTransition(2,'b',2);
-      // A2.addTransition(1,'a',2);
-      // A2.addTransition(0,'b',2);
-      // A2.setStateFinal(2);
-      // A2.setStateInitial(1);
-      // A2.setStateInitial(0);
+      fa::Automaton A2=RandomAutomaton(nbStates);
         //A1.dotPrint(std::cout);
        //A2.dotPrint(std::cout);
       // return 0;
