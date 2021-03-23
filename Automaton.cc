@@ -692,7 +692,7 @@ fa::Automaton RandomAutomaton(int nbstates){
       for(char c : letter){
         double rand1 = rand() / (double)RAND_MAX;
         
-        if(rand1 < 1.6/(nbstates)){
+        if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
           fich << "A2.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
@@ -764,7 +764,7 @@ int main(int argc, char **argv){
     }
     //printf("nb : %d\n",nbStates);
     srand(25);
-    fa::Automaton A1=RandomAutomaton(20);
+    //fa::Automaton A1=RandomAutomaton(40);
     if(argc==5){
       srand(atoi(argv[4]));
     }else{
@@ -772,19 +772,19 @@ int main(int argc, char **argv){
     }
       
   //Automate reconnaissant tous les mots
-      // fa::Automaton A1;
+       fa::Automaton A1;
 
-      // A1.addSymbol('a');
-      // A1.addSymbol('b');
-      // A1.addState(0);
+      A1.addSymbol('a');
+      A1.addSymbol('b');
+      A1.addState(0);
 
-      // A1.setStateInitial(0);
-      // A1.setStateFinal(0);
+      A1.setStateInitial(0);
+      A1.setStateFinal(0);
 
-      //  A1.addTransition(0,'a',0);
-      //  A1.addTransition(0,'b',0);
-      // A1.addState(0);A1.addState(1);
-      // A1.addState(2);A1.addState(3);
+       A1.addTransition(0,'a',0);
+       A1.addTransition(0,'b',0);
+      A1.addState(0);A1.addState(1);
+      A1.addState(2);A1.addState(3);
 
       // A1.setStateInitial(0);
       // A1.setStateFinal(3);A1.setStateFinal(2);

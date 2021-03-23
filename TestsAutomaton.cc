@@ -938,24 +938,24 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 int main(int argc, char **argv){
   srand(25);
-     fa::Automaton A1=RandomAutomaton(40);
+     //fa::Automaton A1=RandomAutomaton(40);
 
-      // fa::Automaton A1;
-      // A1.addSymbol('a');
-      // A1.addSymbol('b');
+       fa::Automaton A1;
+      A1.addSymbol('a');
+      A1.addSymbol('b');
 
-      // A1.addState(0);
+      A1.addState(0);
 
-      // A1.setStateInitial(0);
-      // A1.setStateFinal(0);
+      A1.setStateInitial(0);
+      A1.setStateFinal(0);
 
-      // A1.addTransition(0,'a',0);
-      // A1.addTransition(0,'b',0);
-      // A1.addState(0);A1.addState(1);
-      // A1.addState(2);A1.addState(3);
+      A1.addTransition(0,'a',0);
+      A1.addTransition(0,'b',0);
+      A1.addState(0);A1.addState(1);
+      A1.addState(2);A1.addState(3);
 
-      // A1.setStateInitial(0);
-      // A1.setStateFinal(3);A1.setStateFinal(2);
+      A1.setStateInitial(0);
+      A1.setStateFinal(3);A1.setStateFinal(2);
 
       // A1.addTransition(0,'a',1);A1.addTransition(1,'a',2);
       // A1.addTransition(2,'a',1);A1.addTransition(1,'a',3);
