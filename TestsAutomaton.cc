@@ -879,8 +879,10 @@ namespace fa {
       time=(std::clock()-start)/(double) CLOCKS_PER_SEC;
       std::cout<<"temps pour la déterminisation: "<<time<<std::endl;
       std::cout<<"Création du complément DONE\n";
-      //Automaton deter=createDeterministic(*this);
-      return hasEmptyIntersectionWith(complement);
+      //return hasEmptyIntersectionWith(complement); //Avant amélioration
+      
+      Automaton deter=createDeterministic(*this);
+      return deter.hasEmptyIntersectionWith(complement);
     }
 
 }
@@ -906,7 +908,7 @@ fa::Automaton RandomAutomaton(int nbstates){
       for(char c : letter){
         double rand1 = rand() / (double)RAND_MAX;
 
-        if(rand1 < 1.6/(nbstates)){
+        if(rand1 < 2.5/(nbstates/3)){
           res.addTransition(s.nb,c,ss.nb);
           //fich << "A2.addTransition("<<s.nb<<",'"<<c<<"',"<<ss.nb<<");"<<"\n";
         }
@@ -916,14 +918,14 @@ fa::Automaton RandomAutomaton(int nbstates){
 
   for(int i=0;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.3){
+    if(rand1 < 0.5){
       res.setStateFinal(i);
     //  fich << "A2.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
-    if(rand1 < 0.3){
+    if(rand1 < 0.5){
       res.setStateInitial(i);
      // fich << "A2.setStateInitial("<<i<<");"<<"\n";
     }
@@ -937,8 +939,8 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 
 int main(int argc, char **argv){
-  srand(25);
-     //fa::Automaton A1=RandomAutomaton(40);
+  srand(20);
+  //fa::Automaton A1=RandomAutomaton(40);
 
        fa::Automaton A1;
       A1.addSymbol('a');
@@ -954,13 +956,6 @@ int main(int argc, char **argv){
       A1.addState(0);A1.addState(1);
       A1.addState(2);A1.addState(3);
 
-      A1.setStateInitial(0);
-      A1.setStateFinal(3);A1.setStateFinal(2);
-
-      // A1.addTransition(0,'a',1);A1.addTransition(1,'a',2);
-      // A1.addTransition(2,'a',1);A1.addTransition(1,'a',3);
-      // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);A1.addTransition(1,'b',3);
-      // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
       if(argc>2){
       srand(atoi(argv[2]));
     }else{

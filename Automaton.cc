@@ -763,8 +763,8 @@ int main(int argc, char **argv){
       nbStates=stoi(argv[3]);
     }
     //printf("nb : %d\n",nbStates);
-    srand(25);
-    //fa::Automaton A1=RandomAutomaton(40);
+    srand(20);
+    fa::Automaton A1=RandomAutomaton(40);
     if(argc==5){
       srand(atoi(argv[4]));
     }else{
@@ -772,27 +772,19 @@ int main(int argc, char **argv){
     }
       
   //Automate reconnaissant tous les mots
-       fa::Automaton A1;
+      //  fa::Automaton A1;
 
-      A1.addSymbol('a');
-      A1.addSymbol('b');
-      A1.addState(0);
-
-      A1.setStateInitial(0);
-      A1.setStateFinal(0);
-
-       A1.addTransition(0,'a',0);
-       A1.addTransition(0,'b',0);
-      A1.addState(0);A1.addState(1);
-      A1.addState(2);A1.addState(3);
+      // A1.addSymbol('a');
+      // A1.addSymbol('b');
+      // A1.addState(0);
 
       // A1.setStateInitial(0);
-      // A1.setStateFinal(3);A1.setStateFinal(2);
+      // A1.setStateFinal(0);
 
-      // A1.addTransition(0,'a',1);A1.addTransition(1,'a',2);
-      // A1.addTransition(2,'a',1);A1.addTransition(1,'a',3);
-      // A1.addTransition(0,'b',0);A1.addTransition(0,'b',3);
-      // A1.addTransition(3,'b',1);A1.addTransition(3,'b',2);
+      //  A1.addTransition(0,'a',0);
+      //  A1.addTransition(0,'b',0);
+      // A1.addState(0);A1.addState(1);
+      // A1.addState(2);A1.addState(3);
       
       fa::Automaton A2=RandomAutomaton(nbStates);
         //A1.dotPrint(std::cout);

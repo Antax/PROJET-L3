@@ -5,7 +5,6 @@
 # ./speedTest.sh --DET nbExec nbStates (rand || nb)
 # nb : for srand
 
-
 if [ $# -ne 3 ] && [ $# -ne 4 ] && [ $# -ne 5 ]
 then
     echo "Usage : ./speedTest.sh (--SAT/--DET) numberOfExecutions numberOfStates (maxLength (NB/rand))"
@@ -79,7 +78,7 @@ else #--DET
         then
             ./TestsAutomaton $3 $i
         else
-            if [ $3 == "rand" ]
+            if [ $4 == "rand" ]
             then
                 ./TestsAutomaton $3 
             else
