@@ -758,7 +758,7 @@ namespace fa {
         }
         return true;
       }
-      std::cout<<"Product\n";
+      //std::cout<<"Product\n";
       double time=0.0;
       std::clock_t start;
       start=std::clock();
@@ -766,8 +766,8 @@ namespace fa {
       
        Automaton product=createProduct(*this,other);
        time=(std::clock()-start)/(double) CLOCKS_PER_SEC;
-      std::cout<<"temps de l'intersection : "<<time<<std::endl;
-      std::cout<<"Product DONE\n";
+      //std::cout<<"temps de l'intersection : "<<time<<std::endl;
+      //std::cout<<"Product DONE\n";
       if(!product.isValid()){ //Never go inside
         return true;
       }
@@ -871,14 +871,14 @@ namespace fa {
           copy.addSymbol(symb);
         }
       }
-      std::cout<<"Création du complément\n";
+      //std::cout<<"Création du complément\n";
       double time=0.0;
       std::clock_t start;
       start=std::clock(); 
       Automaton complement=createComplement(copy);
       time=(std::clock()-start)/(double) CLOCKS_PER_SEC;
-      std::cout<<"temps pour la déterminisation: "<<time<<std::endl;
-      std::cout<<"Création du complément DONE\n";
+      //std::cout<<"temps pour la déterminisation: "<<time<<std::endl;
+      //std::cout<<"Création du complément DONE\n";
       //return hasEmptyIntersectionWith(complement); //Avant amélioration
       
       Automaton deter=createDeterministic(*this);
