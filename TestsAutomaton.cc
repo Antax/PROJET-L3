@@ -895,6 +895,7 @@ fa::Automaton RandomAutomaton(int nbstates){
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
+  letter.push_back('c');
   for(char c : letter){
     res.addSymbol(c);
   //  fich << "A2.addSymbol('"<<c<<"');"<<"\n";
@@ -939,8 +940,8 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 
 int main(int argc, char **argv){
-  srand(20);
-  fa::Automaton A1=RandomAutomaton(20);
+  srand(25);
+  fa::Automaton A1=RandomAutomaton(6);
 
       //  fa::Automaton A1;
       // A1.addSymbol('a');
@@ -967,11 +968,11 @@ int main(int argc, char **argv){
     }
     //printf("nb : %d\n",nbStates);
   fa::Automaton A2=RandomAutomaton(nbStates);
-  //A2.dotPrint(std::cout);
+  // A2.dotPrint(std::cout);
+  // A2.dotPrint(std::cout);
     if(A1.isIncludedIn(A2)){
         printf("Automaton A1 is Include in A2 : True \n");
     }else{
         printf("Automaton A1 is not Include in A2 : False \n");
     }
-
 }
