@@ -579,6 +579,85 @@ namespace fa {
       return true;
     }
 
+    /**
+     * Browse the automaton to remove the Non-accessbile states
+     */
+    void Automaton::DepthSearchRemove(std::_Rb_tree_const_iterator<fa::Automaton::State>& s,std::set<int>& visit){
+      visit.insert(s->nb);
+      auto tr=s->transitions.begin();
+      while(tr!=s->transitions.end()){
+        if(tr->to==tr->from){ //if the transition is in the current state, we have already tested if the state was final.
+          tr++;
+          if(tr==s->transitions.end()){
+            break;
+          }
+        }
+        auto si = states.find(tr->to);
+        if(visit.find(si->nb)==visit.end()){
+          DepthSearchRemove(si,visit);
+        }
+        tr++;
+      }
+    }
+
+    /**
+     * Remove non-accessible states
+     */
+    void Automaton::removeNonAccessibleStates(){
+      if(!isValid()){
+        return;
+      }
+      std::set<int> visit;
+      auto s=states.begin();
+      while(s!=states.end()){
+        if(s->isInit){
+          DepthSearchRemove(s,visit);
+        }
+        s++;
+      }
+      s=states.begin();
+      while(s!=states.end()){
+        if(visit.find(s->nb)==visit.end()){
+          s=states.erase(s);
+          //Pas besoin de s'occuper des transitions qui viennent à lui puisque soit il n'y en a pas, soit elles proviennent d'un état poubelle qui sera également supprimé
+        }else{
+          s++;
+        }
+      }
+      if(!isValid()){
+        //addState(0);
+      }
+    }
+
+    /**
+     * Remove non-co-accessible states
+     */
+    void Automaton::removeNonCoAccessibleStates(){
+      if(!isValid()){
+        return;
+      }
+      std::set<int> visit;
+      auto s=states.begin();
+      while(s!=states.end()){
+        if(!s->isFinal){
+          if(DepthSearchEmpty(s,visit)){
+            auto temp=s;
+            s++;
+            removeState(temp->nb);
+          }else{
+            s++;
+          }
+        }else{
+          s++;
+        }
+        visit.clear();
+      }
+      if(!isValid()){
+       // addState(0);
+      }
+      
+    }
+
 
     /**
      * Create the product of two automata

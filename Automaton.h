@@ -235,6 +235,14 @@ namespace fa {
     static void depthSearchAccessibles(const Automaton *automaton,std::set<int> &accessibleStates,int state);
     static std::set<int> statesToState(const Automaton *automaton,int from);
     static void depthSearchCoAccessibles(const Automaton *automaton,std::set<int> &accessibleStates,int state);
+    /**
+     * Browse the automaton to check if the language is empty (and remove the Non-Co-accessible states)
+     */
+    bool DepthSearchEmpty(std::_Rb_tree_iterator<std::pair<const int, int>>& s,std::set<int>& visit);
+    /**
+     * Browse the automaton to remove the Non-accessbile states
+     */
+    void DepthSearchRemove(std::_Rb_tree_iterator<std::pair<const int, int>>& s,std::set<int>& visit);
   };
 
 }

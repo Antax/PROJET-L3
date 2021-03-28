@@ -301,28 +301,74 @@ namespace fa{
     return true;
   }
 
-  void Automaton::removeNonAccessibleStates(){
-    //vector containing the accessible states
-    std::set<int> accessibleStates;
-    //depth first search from each initial state
-    for(std::map<int,int>::const_iterator itStates=etats.begin();itStates!=etats.end();++itStates){
-      //if Initial and not already visited
-      if(itStates->second%2==1 && accessibleStates.find(itStates->second)==accessibleStates.end()){
-        depthSearchAccessibles(this,accessibleStates,itStates->first);
+  /**
+     * Browse the automaton to remove the Non-accessbile states
+     */
+    void Automaton::DepthSearchRemove(std::_Rb_tree_iterator<std::pair<const int, int>>& s,std::set<int>& visit){
+      visit.insert(s->first);
+      auto tr=transis.at(s->first).begin();
+      while(tr!=transis.at(s->first).end()) {
+        if(tr->second==s->first){ //if the transition is in the current state, we have already tested if the state was final.
+          tr++;
+          if(tr==transis.at(s->first).end()){
+            break;
+          }
+        }
+        auto si = etats.find(tr->second);
+        if(visit.find(si->first)==visit.end()){
+          DepthSearchRemove(si,visit);
+        }
+        tr++;
       }
     }
 
-    std::map<int,int>::const_iterator it=etats.begin();
-    while(it!=etats.end()){
-      if(std::find(accessibleStates.begin(),accessibleStates.end(),it->first)==accessibleStates.end()){
-        int toRemove=it->first;
-        ++it;
-        removeState(toRemove);
-      }else{
-        ++it;
+  void Automaton::removeNonAccessibleStates(){
+    //vector containing the accessible states
+    // std::set<int> accessibleStates;
+    // //depth first search from each initial state
+    // for(std::map<int,int>::const_iterator itStates=etats.begin();itStates!=etats.end();++itStates){
+    //   //if Initial and not already visited
+    //   if(itStates->second%2==1 && accessibleStates.find(itStates->second)==accessibleStates.end()){
+    //     depthSearchAccessibles(this,accessibleStates,itStates->first);
+    //   }
+    // }
+
+    // std::map<int,int>::const_iterator it=etats.begin();
+    // while(it!=etats.end()){
+    //   if(std::find(accessibleStates.begin(),accessibleStates.end(),it->first)==accessibleStates.end()){
+    //     int toRemove=it->first;
+    //     ++it;
+    //     removeState(toRemove);
+    //   }else{
+    //     ++it;
+    //   }
+    // }
+
+    if(!isValid()){
+        return;
       }
-    }
+      std::set<int> visit;
+      auto s=etats.begin();
+      while(s!=etats.end()){
+        if(isStateInitial(s->first)){
+          DepthSearchRemove(s,visit);
+        }
+        s++;
+      }
+      s=etats.begin();
+      while(s!=etats.end()){
+        if(visit.find(s->first)==visit.end()){
+          s=etats.erase(s);
+          //Pas besoin de s'occuper des transitions qui viennent à lui puisque soit il n'y en a pas, soit elles proviennent d'un état poubelle qui sera également supprimé
+        }else{
+          s++;
+        }
+      }
+      if(!isValid()){
+        //addState(0);
+      }
   }
+
 
   void Automaton::depthSearchAccessibles(const Automaton *automaton,std::set<int> &accessibleStates,int state){
     accessibleStates.insert(state);
@@ -360,27 +406,78 @@ namespace fa{
     return accessibleStates;
   }
 
-  void Automaton::removeNonCoAccessibleStates(){
-    //vector containing the accessible states
-    std::set<int> coAccessibleStates;
-    //depth first search from each initial state
-    for(std::map<int,int>::const_iterator itStates=etats.begin();itStates!=etats.end();++itStates){
-      //if Initial and not already visited
-      if(itStates->second>1 && coAccessibleStates.find(itStates->second)==coAccessibleStates.end()){
-        depthSearchCoAccessibles(this,coAccessibleStates,itStates->first);
+  /**
+     * Browse the automaton to check if the language is empty
+     * Or check if a state can join a final state
+     */
+    bool Automaton::DepthSearchEmpty(std::_Rb_tree_iterator<std::pair<const int, int>>& s,std::set<int>& visit){
+      visit.insert(s->first);
+      auto tr=transis.at(s->first).begin();
+      while(tr!=transis.at(s->first).end()){
+        if(tr->second==s->first){ //if the transition is in the current state, we have already tested if the state was final.
+          tr++;
+          if(tr==transis.at(s->first).end()){
+            break;
+          }
+        }
+        auto si = etats.find(tr->second);
+        if(isStateFinal(si->first)){
+          return false;
+        }
+        if(visit.find(si->first)==visit.end()){
+          if(DepthSearchEmpty(si,visit)==false){
+            return false;
+          }
+        }
+        tr++;
       }
+      return true;
     }
 
-    std::map<int,int>::const_iterator it=etats.begin();
-    while(it!=etats.end()){
-      if(std::find(coAccessibleStates.begin(),coAccessibleStates.end(),it->first)==coAccessibleStates.end()){
-        int toRemove=it->first;
-        ++it;
-        removeState(toRemove);
-      }else{
-        ++it;
+  void Automaton::removeNonCoAccessibleStates(){
+    //vector containing the accessible states
+    // std::set<int> coAccessibleStates;
+    // //depth first search from each initial state
+    // for(std::map<int,int>::const_iterator itStates=etats.begin();itStates!=etats.end();++itStates){
+    //   //if Initial and not already visited
+    //   if(itStates->second>1 && coAccessibleStates.find(itStates->second)==coAccessibleStates.end()){
+    //     depthSearchCoAccessibles(this,coAccessibleStates,itStates->first);
+    //   }
+    // }
+
+    // std::map<int,int>::const_iterator it=etats.begin();
+    // while(it!=etats.end()){
+    //   if(std::find(coAccessibleStates.begin(),coAccessibleStates.end(),it->first)==coAccessibleStates.end()){
+    //     int toRemove=it->first;
+    //     ++it;
+    //     removeState(toRemove);
+    //   }else{
+    //     ++it;
+    //   }
+    // }
+
+    if(!isValid()){
+        return;
       }
-    }
+      std::set<int> visit;
+      auto s=etats.begin();
+      while(s!=etats.end()){
+        if(!isStateFinal(s->first)){
+          if(DepthSearchEmpty(s,visit)){
+            auto temp=s;
+            s++;
+            removeState(temp->first);
+          }else{
+            s++;
+          }
+        }else{
+          s++;
+        }
+        visit.clear();
+      }
+      if(!isValid()){
+       // addState(0);
+      }
   }
 
   void Automaton::depthSearchCoAccessibles(const Automaton *automaton,std::set<int> &coAccessibleStates,int state){
