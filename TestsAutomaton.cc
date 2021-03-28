@@ -1018,7 +1018,7 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 
 int main(int argc, char **argv){
-  srand(20);
+  srand(25);
   fa::Automaton A1=RandomAutomaton(20);
 
       //  fa::Automaton A1;
