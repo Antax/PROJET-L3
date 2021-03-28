@@ -679,14 +679,13 @@ fa::Automaton RandomAutomaton(int nbstates){
   std::vector<char> letter;
   letter.push_back('a');
   letter.push_back('b');
-  letter.push_back('c');
   for(char c : letter){
     res.addSymbol(c);
-    //fich << "A2.addSymbol('"<<c<<"');"<<"\n";
+    fich << "A2.addSymbol('"<<c<<"');"<<"\n";
   }
   for(int i=0;i<nbstates;++i){
     res.addState(i);
-    //fich << "A2.addState("<<i<<");"<<"\n";
+    fich << "A2.addState("<<i<<");"<<"\n";
   }
   for(auto s : res.etats){
     for(auto ss : res.etats){
@@ -696,7 +695,7 @@ fa::Automaton RandomAutomaton(int nbstates){
         if(rand1 < 1.6/nbstates){
           //printf("\ndouble : %f\n",rand1);
           res.addTransition(s.first,c,ss.first);
-          //fich << "A2.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
+          fich << "A2.addTransition("<<s.first<<",'"<<c<<"',"<<ss.first<<");"<<"\n";
         }
       }
     }
@@ -706,18 +705,18 @@ fa::Automaton RandomAutomaton(int nbstates){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.3){
       res.setStateFinal(i);
-      //fich << "A2.setStateFinal("<<i<<");"<<"\n";
+      fich << "A2.setStateFinal("<<i<<");"<<"\n";
     }
   }
   for(int i=1;i<nbstates;i++){
     double rand1 = rand() / (double)RAND_MAX;
     if(rand1 < 0.3){
       res.setStateInitial(i);
-      //fich << "A2.setStateInitial("<<i<<");"<<"\n";
+      fich << "A2.setStateInitial("<<i<<");"<<"\n";
     }
   }
   res.setStateInitial(0);
-  //fich<<"A2.setStateInitial(0);"<<"\n";
+  fich<<"A2.setStateInitial(0);"<<"\n";
 
   return res;
 }
@@ -765,7 +764,7 @@ int main(int argc, char **argv){
     }
     //printf("nb : %d\n",nbStates);
     srand(25);
-    fa::Automaton A1=RandomAutomaton(6);
+    fa::Automaton A1=RandomAutomaton(20);
     if(argc==5){
       srand(atoi(argv[4]));
     }else{
@@ -786,10 +785,7 @@ int main(int argc, char **argv){
       //  A1.addTransition(0,'b',0);
       // A1.addState(0);A1.addState(1);
       // A1.addState(2);A1.addState(3);
-      
       fa::Automaton A2=RandomAutomaton(nbStates);
-        //A1.dotPrint(std::cout);
-       //A2.dotPrint(std::cout);
       // return 0;
       std::map<std::string,int> tableOfCorrespondances;
       //index is used to insert elements
@@ -840,11 +836,8 @@ int main(int argc, char **argv){
       for(int i=1;i<=length;++i){
         std::string index1 ="a "+std::to_string(i);
         std::string index2 ="b "+std::to_string(i);
-        std::string index3 ="c "+std::to_string(i);
-        cnfFile << tableOfCorrespondances[index1] << " " << tableOfCorrespondances[index2] << " " << tableOfCorrespondances[index3] <<" 0\n";
+        cnfFile << tableOfCorrespondances[index1] << " " << tableOfCorrespondances[index2] << " 0\n";
         cnfFile << "-" << tableOfCorrespondances[index1] << " -" <<tableOfCorrespondances[index2] << " 0\n";
-        cnfFile << "-" << tableOfCorrespondances[index1] << " -" <<tableOfCorrespondances[index3] << " 0\n";
-        cnfFile << "-" << tableOfCorrespondances[index2] << " -" <<tableOfCorrespondances[index2] << " 0\n";
       }
 
       //Starts with an initial state
@@ -893,7 +886,6 @@ int main(int argc, char **argv){
       for(std::map<int,int>::const_iterator state=A1.etats.begin();state!=A1.etats.end();++state){
         std::set<int> destinationsA=statesFromStateLetter(&A1,state->first,'a');
         std::set<int> destinationsB=statesFromStateLetter(&A1,state->first,'b');
-        std::set<int> destinationsC=statesFromStateLetter(&A1,state->first,'c');
         for(int step=0;step<length;++step){
           std::string index1="A1 "+std::to_string(state->first)+" "+std::to_string(step);
           std::string index2 ="a "+std::to_string(step+1);
@@ -906,13 +898,6 @@ int main(int argc, char **argv){
           std::string index4 ="b "+std::to_string(step+1);
           cnfFile << "-" <<tableOfCorrespondances[index1]<<" -"<<tableOfCorrespondances[index4];
           for(std::set<int>::const_iterator to=destinationsB.begin();to!=destinationsB.end();to++){
-            std::string index3="A1 "+std::to_string(*to)+" "+std::to_string(step+1);
-            cnfFile << " "<<tableOfCorrespondances[index3];
-          }
-          cnfFile<<" 0\n";
-          std::string index5 ="c "+std::to_string(step+1);
-          cnfFile << "-" <<tableOfCorrespondances[index1]<<" -"<<tableOfCorrespondances[index5];
-          for(std::set<int>::const_iterator to=destinationsC.begin();to!=destinationsC.end();to++){
             std::string index3="A1 "+std::to_string(*to)+" "+std::to_string(step+1);
             cnfFile << " "<<tableOfCorrespondances[index3];
           }
@@ -940,7 +925,6 @@ int main(int argc, char **argv){
       for(std::map<int,int>::const_iterator state=A2.etats.begin();state!=A2.etats.end();++state){
         std::set<int> destinationsA=statesFromStateLetter(&A2,state->first,'a');
         std::set<int> destinationsB=statesFromStateLetter(&A2,state->first,'b');
-        std::set<int> destinationsC=statesFromStateLetter(&A1,state->first,'c');
         for(int step=0;step<length;step++){
           for(auto to : destinationsA){
             std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
@@ -954,15 +938,6 @@ int main(int argc, char **argv){
           for(auto to : destinationsB){
             std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
             std::string index2="";index2.push_back('b');index2+=" "+std::to_string(step+1); //satValueWord
-            std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
-            cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
-            cnfFile << " " << tableOfCorrespondances[index3];
-            cnfFile<<" 0\n";
-          }
-
-          for(auto to : destinationsC){
-            std::string index="A2 ";index+=std::to_string(state->first)+" "+std::to_string(step); //satValueAutomatons
-            std::string index2="";index2.push_back('c');index2+=" "+std::to_string(step+1); //satValueWord
             std::string index3="A2 ";index3+=std::to_string(to)+" "+std::to_string(step+1); //satValueAutomatons
             cnfFile << "-" <<tableOfCorrespondances[index]<<" -"<<tableOfCorrespondances[index2];
             cnfFile << " " << tableOfCorrespondances[index3];
