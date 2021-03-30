@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+/*********  main start at line 1020  ************************/
 namespace fa {
   
   Automaton::Automaton() {
@@ -1020,7 +1020,7 @@ fa::Automaton RandomAutomaton(int nbstates){
 int main(int argc, char **argv){
   srand(25);
   fa::Automaton A1=RandomAutomaton(20);
-
+    //Automaton recognizing every words
       //  fa::Automaton A1;
       // A1.addSymbol('a');
       // A1.addSymbol('b');

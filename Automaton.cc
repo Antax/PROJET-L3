@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <string.h> 
+/*********  main start at line 825, rules writting at line 885   ************************/
 namespace fa{
   Automaton::Automaton() { 
     
@@ -827,7 +828,8 @@ int main(int argc, char **argv){
     length=stoi(argv[2]);
   }
   //printf("length : %d\n",length);
-  
+
+  /**********   without argument, get the world that is not included     ***********/
   if(argc==1){
     std::map<int,int> result;
     string line;
@@ -859,7 +861,6 @@ int main(int argc, char **argv){
     if(argc>3){
       nbStates=stoi(argv[3]);
     }
-    //printf("nb : %d\n",nbStates);
     srand(25);
     fa::Automaton A1=RandomAutomaton(20);
     if(argc==5){
@@ -883,7 +884,7 @@ int main(int argc, char **argv){
       // A1.addState(0);A1.addState(1);
       // A1.addState(2);A1.addState(3);
       fa::Automaton A2=RandomAutomaton(nbStates);
-      // return 0;
+
       std::map<std::string,int> tableOfCorrespondances;
       //index is used to insert elements
       int tableIndex=1;
