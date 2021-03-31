@@ -823,24 +823,29 @@ fa::Automaton RandomAutomaton(int nbstates){
 
 using namespace std;
 int main(int argc, char **argv){
-  int length=40;
+  int length=7;
   if(argc>2){
     length=stoi(argv[2]);
   }
   //printf("length : %d\n",length);
 
-  /**********   without argument, get the world that is not included     ***********/
-  if(argc==1){
+  /**********   without argument, get the word that is not included     ***********/
+  if(argc<3){
+    if(stoi(argv[1])>0){
+      length=stoi(argv[1]);
+    }else{
+      std::cout<<"Error, need word's number\n";
+      return 1;
+    }
     std::map<int,int> result;
     string line;
-    ifstream outFile ("test.out");
+    ifstream outFile ("Automaton.out");
     if (outFile.is_open()){
       while(getline(outFile,line)){
         if(line.compare("UNSAT")==0){
           std::cout << "A1 is included in A2\n";
           return 1;
         }
-        std::cout << "A1 is not included in A2\n";
 
         if(!line.compare("SAT")==0){
           for(int i=0;i<length;++i){
@@ -851,9 +856,10 @@ int main(int argc, char **argv){
               std::cout<<"b";
             }
           }
+          std::cout << "\n";
         }
       }
-      std::cout << "\n";
+      std::cout << "A1 is not included in A2\n";
       outFile.close();
     }
   }else{
@@ -861,8 +867,8 @@ int main(int argc, char **argv){
     if(argc>3){
       nbStates=stoi(argv[3]);
     }
-    srand(25);
-    fa::Automaton A1=RandomAutomaton(20);
+     srand(25);
+     fa::Automaton A1=RandomAutomaton(20);
     if(argc==5){
       srand(atoi(argv[4]));
     }else{
@@ -870,8 +876,7 @@ int main(int argc, char **argv){
     }
       
   //Automate reconnaissant tous les mots
-      //  fa::Automaton A1;
-
+      // fa::Automaton A1;
       // A1.addSymbol('a');
       // A1.addSymbol('b');
       // A1.addState(0);
@@ -883,8 +888,18 @@ int main(int argc, char **argv){
       //  A1.addTransition(0,'b',0);
       // A1.addState(0);A1.addState(1);
       // A1.addState(2);A1.addState(3);
-      fa::Automaton A2=RandomAutomaton(nbStates);
-
+       fa::Automaton A2=RandomAutomaton(nbStates);
+      /***** A2 for demo ******/
+      // fa::Automaton A2;
+      // A2.addSymbol('a');A2.addSymbol('b');
+      // A2.addState(0);A2.addState(1);A2.addState(2);A2.addState(3);
+      // A2.setStateInitial(0);//A2.setStateInitial(3);
+      // A2.setStateFinal(3);
+      // A2.addTransition(0,'a',2);A2.addTransition(2,'b',3);A2.addTransition(2,'b',3);A2.addTransition(1,'a',0);A2.addTransition(0,'b',1); 
+      //A2.addTransition(3,'a',3);A2.addTransition(3,'b',3);
+      
+      // A1.dotPrint(std::cout);
+      // A2.dotPrint(std::cout);
       std::map<std::string,int> tableOfCorrespondances;
       //index is used to insert elements
       int tableIndex=1;
@@ -926,7 +941,7 @@ int main(int argc, char **argv){
       //printf("C4 : %.2fs \n",(double)(clock()-c4)/CLOCKS_PER_SEC);
 
       ofstream cnfFile;
-      cnfFile.open("test.cnf");
+      cnfFile.open("Automaton.cnf");
       cnfFile << "p cnf " << tableIndex << " 0 \n";
       /**************************Word is in A1*************************************/
       //clock_t c5=clock();

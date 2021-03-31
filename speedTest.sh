@@ -49,17 +49,17 @@ then
         do
             if [ $# -ne 5 ]
             then
-                ./Automaton --SAT $j $3 $i
+                ./Automaton --SAT $j $3 $i  #$i = seed
             else
-                if [ $5 == "rand" ]
-                then
+                if [ $5 == "rand" ]   #$j = word's length
+                then                  #$3 = number of state of A2
                     ./Automaton --SAT $j $3
                 else
-                    ./Automaton --SAT $j $3 $[$i+$5]
+                    ./Automaton --SAT $j $3 $[$i+$5]        #$[$i+$5] = seed
                 fi
             fi
-            minisat test.cnf test.out &>/dev/null
-            line=$(head -n 1 test.out)
+            minisat Automaton.cnf Automaton.out &>/dev/null
+            line=$(head -n 1 Automaton.out)
             if [ "SAT" == $line ]
             then
             echo $j
@@ -67,7 +67,7 @@ then
             fi
             if [ $j == $4 ] #if maxlength has been tested
             then
-            echo 'Automate is Include'
+            echo 'Automate is Included'
             fi
         done
     done

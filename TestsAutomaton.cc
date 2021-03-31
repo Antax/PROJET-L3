@@ -1048,9 +1048,9 @@ int main(int argc, char **argv){
   fa::Automaton A2=RandomAutomaton(nbStates);
   //A2.dotPrint(std::cout);
     if(A1.isIncludedIn(A2)){
-        printf("Included\n");
+        printf("A1 is Included\n");
     }else{
-        printf("Not included\n");
+        printf("A1 is Not included\n");
     }
 
 }
